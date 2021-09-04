@@ -8,11 +8,12 @@ import {
 import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import {
-    CertificationMethodCode,
-    MarketingConsentCode,
-    PrivacyConsentCode,
-    VideoOptionCode,
+    MemberRefVideoIsBookmarkedCode,
+    MemberMarketingConsentCode,
+    MemberPrivacyConsentCode,
+    MemberVideoOptionCode,
 } from 'src/common/enums/code.enum';
+import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -35,7 +36,7 @@ export class Member extends CoreEntity {
         type: 'varchar',
         length: 50,
     })
-    @IsEnum(CertificationMethodCode)
+    @IsEnum(MemberRefVideoIsBookmarkedCode)
     certificationMethodCode: string;
 
     @Column({
@@ -48,11 +49,11 @@ export class Member extends CoreEntity {
     profileImageUrl: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
-    @IsEnum(PrivacyConsentCode)
+    @IsEnum(MemberPrivacyConsentCode)
     privacyConsentCode: string;
 
     @Column({ name: 'mbr_marketing_consent', type: 'varchar', length: 50 })
-    @IsEnum(MarketingConsentCode)
+    @IsEnum(MemberMarketingConsentCode)
     marketingConsentCode: string;
 
     @Column({
@@ -61,7 +62,7 @@ export class Member extends CoreEntity {
         length: 50,
         default: '40002',
     })
-    @IsEnum(VideoOptionCode)
+    @IsEnum(MemberVideoOptionCode)
     videoOptionCode: string;
 
     @OneToMany((type) => Analysis, (analysis) => analysis.member)
@@ -69,4 +70,10 @@ export class Member extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.member)
     practices: Practice[];
+
+    @OneToMany(
+        (type) => MemberRefVideo,
+        (memberRefVideo) => memberRefVideo.member,
+    )
+    memberRefVideoes: MemberRefVideo[];
 }

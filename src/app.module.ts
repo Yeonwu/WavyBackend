@@ -9,6 +9,8 @@ import { CommonModule } from './common/common.module';
 import * as Joi from 'joi';
 import { Member } from './members/entities/members.entity';
 import { Group, GroupDetail } from './common/entities/code.entity';
+import { Analysis } from './analyses/entities/analyses.entity';
+import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videoes/entities/ref-video.entity';
 
@@ -38,7 +40,15 @@ import { RefVideo } from './ref-videoes/entities/ref-video.entity';
             database: process.env.DB_NAME,
             synchronize: process.env.NODE_ENV !== 'prod',
             logging: process.env.NODE_ENV !== 'prod',
-            entities: [Member, Group, GroupDetail, Practice, RefVideo],
+            entities: [
+                Member,
+                Group,
+                GroupDetail,
+                Analysis,
+                MemberRefVideo,
+                Practice,
+                RefVideo,
+            ],
         }),
         MembersModule,
         PracticesModule,

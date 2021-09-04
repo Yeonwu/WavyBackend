@@ -1,9 +1,11 @@
 import { IsEnum, IsNumberString, IsString, IsUrl } from 'class-validator';
+import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import {
     RefVideoDifficultyCode,
     RefVideoSourceCode,
 } from 'src/common/enums/code.enum';
+import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
