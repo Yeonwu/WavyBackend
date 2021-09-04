@@ -13,8 +13,14 @@ import {
     PrivacyConsentCode,
     VideoOptionCode,
 } from 'src/common/enums/code.enum';
-import { Practice } from 'src/practices/entities/practice.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
+import {
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    RelationId,
+} from 'typeorm';
 
 @Entity()
 export class Member extends CoreEntity {
@@ -69,4 +75,10 @@ export class Member extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.member)
     practices: Practice[];
+
+    @OneToMany(
+        (type) => MemberRefVideo,
+        (memberRefVideo) => memberRefVideo.member,
+    )
+    memberRefVideoes: MemberRefVideo[];
 }
