@@ -1,5 +1,4 @@
 import {
-    IsDate,
     IsEnum,
     IsNumber,
     IsNumberString,
@@ -30,7 +29,7 @@ export class Analysis extends CoreEntity {
     member: Member;
 
     @RelationId((analysis: Analysis) => analysis.member)
-    memberId: string;
+    mbrSeq: string;
 
     @ManyToOne((type) => RefVideo, (refVideo) => refVideo.analyses)
     @JoinColumn({ name: 'rv_seq' })
