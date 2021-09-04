@@ -43,7 +43,7 @@ export class Analysis extends CoreEntity {
     @IsNumber()
     anScore: number;
 
-    @Column({ name: 'an_grade_cd', type: 'varchar', length: '50' })
+    @Column({ name: 'an_grade_cd', type: 'varchar', length: 50 })
     @IsEnum(AnalysisGradeCode)
     anGradeCode: string;
 
@@ -51,7 +51,7 @@ export class Analysis extends CoreEntity {
     @IsString()
     anUserVideoDuration: string;
 
-    @Column({ name: 'an_user_video_url', type: 'varchar', length: '255' })
+    @Column({ name: 'an_user_video_url', type: 'varchar', length: 255 })
     @IsUrl()
     anUserVideoURL: string;
 
@@ -63,7 +63,7 @@ export class Analysis extends CoreEntity {
     @IsUrl()
     anUserVideoMotionDataURL: string;
 
-    @Column({ name: 'an_simularity_url', type: 'varchar', length: '255' })
+    @Column({ name: 'an_simularity_url', type: 'varchar', length: 255 })
     @IsUrl()
     anSimularityURL: string;
 }
