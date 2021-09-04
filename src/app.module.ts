@@ -46,7 +46,7 @@ import { RefVideo } from './ref-videoes/entities/ref-video.entity';
                 GroupDetail,
                 Analysis,
                 MemberRefVideo,
-				Practice,
+                Practice,
                 RefVideo,
             ],
         }),
