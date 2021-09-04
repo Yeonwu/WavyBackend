@@ -3,11 +3,12 @@ import { MembersModule } from './members/members.module';
 import { PracticesModule } from './practices/practices.module';
 import { AnalysesModule } from './analyses/analyses.module';
 import { RefVideoesModule } from './ref-videoes/ref-videoes.module';
-import { MembersRefVideoesModule } from './members-ref-videoes/members-ref-videoes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import * as Joi from 'joi';
+import { Member } from './members/entities/members.entity';
+import { Group, GroupDetail } from './common/entities/code.entity';
 
 @Module({
   imports: [
@@ -34,13 +35,12 @@ import * as Joi from 'joi';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: process.env.NODE_ENV !== 'prod',
-      entities: [],
+      entities: [Member, Group, GroupDetail],
     }),
     MembersModule,
     PracticesModule,
     AnalysesModule,
     RefVideoesModule,
-    MembersRefVideoesModule,
     CommonModule,
   ],
   controllers: [],
