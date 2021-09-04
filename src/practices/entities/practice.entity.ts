@@ -18,11 +18,11 @@ export class Practice extends CoreEntity {
     @IsNumberString()
     ptSeq: string;
 
-    @Column({ name: 'pt_started', type: 'timestamp' })
+    @Column({ name: 'pt_started', type: 'time' })
     @IsString()
     ptStarted: string;
 
-    @Column({ name: 'pt_finished', type: 'timestamp' })
+    @Column({ name: 'pt_finished', type: 'time' })
     @IsString()
     ptFinished: string;
 
