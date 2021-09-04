@@ -7,7 +7,7 @@ import {
     IsUrl,
 } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { GradeCode } from 'src/common/enums/code.enum';
+import { AnalysisGradeCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videoes/entities/ref-video.entity';
 import {
@@ -44,7 +44,7 @@ export class Analysis extends CoreEntity {
     anScore: number;
 
     @Column({ name: 'an_grade_cd', type: 'varchar', length: '50' })
-    @IsEnum(GradeCode)
+    @IsEnum(AnalysisGradeCode)
     anGradeCode: string;
 
     @Column({ name: 'an_user_video_duration', type: 'time' })
