@@ -1,4 +1,11 @@
-import { IsDate, IsEnum, IsNumber, IsString, IsUrl } from 'class-validator';
+import {
+    IsDate,
+    IsEnum,
+    IsNumber,
+    IsNumberString,
+    IsString,
+    IsUrl,
+} from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { GradeCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
@@ -14,48 +21,49 @@ import {
 
 @Entity()
 export class Analysis extends CoreEntity {
-    @PrimaryGeneratedColumn()
-    key: number;
+    @PrimaryGeneratedColumn({ name: 'an_seq', type: 'bigint' })
+    @IsNumberString()
+    anSeq: string;
 
     @ManyToOne((type) => Member, (member) => member.analyses)
     @JoinColumn({ name: 'mbr_seq' })
     member: Member;
 
     @RelationId((analysis: Analysis) => analysis.member)
-    memberId: number;
+    memberId: string;
 
     @ManyToOne((type) => RefVideo, (refVideo) => refVideo.analyses)
     @JoinColumn({ name: 'rv_seq' })
     refVideo: RefVideo;
 
     @RelationId((analysis: Analysis) => analysis.refVideo)
-    refSeq: number;
+    refSeq: string;
 
-    @Column({ name: 'an_score' })
+    @Column({ name: 'an_score', type: 'int' })
     @IsNumber()
-    score: number;
+    anScore: number;
 
-    @Column({ name: 'an_grade_cd' })
+    @Column({ name: 'an_grade_cd', type: 'varchar', length: '50' })
     @IsEnum(GradeCode)
-    gradeCode: string;
+    anGradeCode: string;
 
     @Column({ name: 'an_user_video_duration', type: 'time' })
     @IsString()
-    userVideoDuration: string;
+    anUserVideoDuration: string;
 
-    @Column({ name: 'an_user_video_url' })
+    @Column({ name: 'an_user_video_url', type: 'varchar', length: '255' })
     @IsUrl()
-    userVideoURL: string;
+    anUserVideoURL: string;
 
-    @Column({ name: 'an_user_video_motion_data_url' })
+    @Column({
+        name: 'an_user_video_motion_data_url',
+        type: 'varchar',
+        length: '255',
+    })
     @IsUrl()
-    userVideoMotionDataURL: string;
+    anUserVideoMotionDataURL: string;
 
-    @Column({ name: 'an_simularity_url' })
+    @Column({ name: 'an_simularity_url', type: 'varchar', length: '255' })
     @IsUrl()
-    simularityURL: string;
-
-    @Column({ name: 'an_analysis_done_date' })
-    @IsDate()
-    AnalysisDoneDate: Date;
+    anSimularityURL: string;
 }
