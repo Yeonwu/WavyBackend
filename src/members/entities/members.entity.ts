@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsString, IsUrl } from 'class-validator';
+import {
+    IsEmail,
+    IsEnum,
+    IsNumberString,
+    IsString,
+    IsUrl,
+} from 'class-validator';
 import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import {
@@ -13,7 +19,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Member extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'mbr_seq', type: 'bigint' })
-    @IsString()
+    @IsNumberString()
     mbrSeq: string;
 
     @Column({ name: 'mbr_email', type: 'varchar', length: 255 })

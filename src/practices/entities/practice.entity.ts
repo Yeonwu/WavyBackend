@@ -1,4 +1,4 @@
-import { IsEnum, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsNumberString, IsString, IsUrl } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { PracticeVideoTypeCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
@@ -15,7 +15,7 @@ import {
 @Entity()
 export class Practice extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'pt_seq', type: 'bigint' })
-    @IsString()
+    @IsNumberString()
     ptSeq: string;
 
     @Column({ name: 'pt_started', type: 'timestamp' })

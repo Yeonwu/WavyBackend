@@ -1,4 +1,4 @@
-import { IsEnum, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsNumberString, IsString, IsUrl } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import {
     RefVideoDifficultyCode,
@@ -10,6 +10,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class RefVideo extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'rv_seq', type: 'bigint' })
+    @IsNumberString()
     rvSeq: string;
 
     @Column({ name: 'rv_source', type: 'varchar', length: 50 })

@@ -1,4 +1,4 @@
-import { IsDate, IsNumber } from 'class-validator';
+import { IsDate, IsNumber, IsNumberString } from 'class-validator';
 import { Column, CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm';
 
 @Entity()
@@ -9,7 +9,7 @@ export class CoreEntity {
     createdDate: Date;
 
     @Column({ name: 'creator_seq', type: 'bigint' })
-    @IsNumber()
+    @IsNumberString()
     creatorSeq: string;
 
     @UpdateDateColumn({ name: 'updated_date', nullable: true })
@@ -17,6 +17,6 @@ export class CoreEntity {
     updatedDate: Date;
 
     @Column({ name: 'updater_seq', type: 'bigint', nullable: true })
-    @IsNumber()
+    @IsNumberString()
     updaterSeq: string;
 }
