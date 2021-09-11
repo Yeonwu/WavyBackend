@@ -25,7 +25,7 @@ export class MemberExpHistory extends CoreEntity {
     member: Member;
 
     @RelationId((memberExpHistory: MemberExpHistory) => memberExpHistory.member)
-    memberSeq: string;
+    mbrSeq: string;
 
     @Column({ name: 'meh_exp_gained', type: 'int' })
     @IsNumber()
