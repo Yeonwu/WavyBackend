@@ -80,7 +80,7 @@ export class Member extends CoreEntity {
 
     @OneToMany(
         (type) => MemberExpHistory,
-        (memberExpHistory) => memberExpHistory.member,
+        (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
     memberExpHistory: MemberExpHistory;
 }
