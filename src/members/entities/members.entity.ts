@@ -16,6 +16,7 @@ import {
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { MemberExpHistory } from './mbr-exp-history.entity';
 
 @Entity()
 export class Member extends CoreEntity {
@@ -76,4 +77,10 @@ export class Member extends CoreEntity {
         (memberRefVideo) => memberRefVideo.member,
     )
     memberRefVideoes: MemberRefVideo[];
+
+    @OneToMany(
+        (type) => MemberExpHistory,
+        (memberExpHistory) => memberExpHistory.member,
+    )
+    memberExpHistory: MemberExpHistory;
 }

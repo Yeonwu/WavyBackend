@@ -13,6 +13,7 @@ import { Analysis } from './analyses/entities/analyses.entity';
 import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videoes/entities/ref-video.entity';
+import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 
 @Module({
     imports: [
@@ -42,10 +43,11 @@ import { RefVideo } from './ref-videoes/entities/ref-video.entity';
             logging: process.env.NODE_ENV !== 'prod',
             entities: [
                 Member,
+                MemberRefVideo,
+                MemberExpHistory,
                 Group,
                 GroupDetail,
                 Analysis,
-                MemberRefVideo,
                 Practice,
                 RefVideo,
             ],
