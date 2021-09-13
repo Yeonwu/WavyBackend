@@ -18,11 +18,11 @@ export class Practice extends CoreEntity {
     @IsNumberString()
     ptSeq: string;
 
-    @Column({ name: 'pt_started', type: 'time' })
+    @Column({ name: 'pt_started', type: 'timestamp' })
     @IsString()
     ptStarted: string;
 
-    @Column({ name: 'pt_finished', type: 'time' })
+    @Column({ name: 'pt_finished', type: 'timestamp' })
     @IsString()
     ptFinished: string;
 
@@ -30,9 +30,14 @@ export class Practice extends CoreEntity {
     @IsEnum(PracticeVideoTypeCode)
     ptVideoTypeCode: string;
 
-    @Column({ name: 'pt_video_url', type: 'varchar', length: 255 })
+    @Column({
+        name: 'pt_video_url',
+        nullable: true,
+        type: 'varchar',
+        length: 255,
+    })
     @IsUrl()
-    ptVideoUrl: string;
+    ptVideoUrl?: string;
 
     @ManyToOne((type) => Member, (member) => member.practices)
     @JoinColumn({ name: 'mbr_seq' })
@@ -41,9 +46,11 @@ export class Practice extends CoreEntity {
     @RelationId((practice: Practice) => practice.member)
     mbrSeq: string;
 
-    @ManyToOne((type) => RefVideo, (refVideo) => refVideo.practices)
+    @ManyToOne((type) => RefVideo, (refVideo) => refVideo.practices, {
+        nullable: true,
+    })
     @JoinColumn({ name: 'rv_seq' })
-    refVideo: RefVideo;
+    refVideo?: RefVideo;
 
     @RelationId((practice: Practice) => practice.refVideo)
     rvSeq: string;
