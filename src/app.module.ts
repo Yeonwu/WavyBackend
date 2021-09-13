@@ -13,6 +13,7 @@ import { Analysis } from './analyses/entities/analyses.entity';
 import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videoes/entities/ref-video.entity';
+import { Tag } from './ref-videoes/entities/tag.entity';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { RefVideo } from './ref-videoes/entities/ref-video.entity';
                 MemberRefVideo,
                 Practice,
                 RefVideo,
+                Tag,
             ],
         }),
         MembersModule,
