@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MembersModule } from './members/members.module';
 import { PracticesModule } from './practices/practices.module';
 import { AnalysesModule } from './analyses/analyses.module';
-import { RefVideoesModule } from './ref-videoes/ref-videoes.module';
+import { RefVideosModule } from './ref-videos/ref-videos.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
@@ -12,8 +12,8 @@ import { Group, GroupDetail } from './common/entities/code.entity';
 import { Analysis } from './analyses/entities/analyses.entity';
 import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
-import { RefVideo } from './ref-videoes/entities/ref-video.entity';
-import { Tag } from './ref-videoes/entities/tag.entity';
+import { RefVideo } from './ref-videos/entities/ref-video.entity';
+import { Tag } from './ref-videos/entities/tag.entity';
 
 @Module({
     imports: [
@@ -55,7 +55,7 @@ import { Tag } from './ref-videoes/entities/tag.entity';
         MembersModule,
         PracticesModule,
         AnalysesModule,
-        RefVideoesModule,
+        RefVideosModule,
         CommonModule,
     ],
     controllers: [],
