@@ -19,7 +19,7 @@ export class RefVideosController {
     getRefVideos(
         @Body() refVideosInput: RefVideosInput,
     ): Promise<RefVideosOutput> {
-        return this.refVideosService.getRefVideos(refVideosInput);
+        return this.refVideosService.allRefVideos(refVideosInput);
     }
 
     @Get(':id')
