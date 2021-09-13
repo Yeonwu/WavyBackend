@@ -12,19 +12,20 @@ export class RefVideosService {
         private readonly refVideos: Repository<RefVideo>,
     ) {}
 
-    async getRefVideos({ page }: RefVideosInput): Promise<RefVideosOutput> {
+    async allRefVideos({ page }: RefVideosInput): Promise<RefVideosOutput> {
         try {
             if (!page) {
                 page = 1;
             }
-            const refVideos = await this.refVideos.find({
-                order: {
-                    updatedDate: 'DESC',
+            const [refVideos, totalResults] = await this.refVideos.findAndCount(
+                {
+                    order: {
+                        updatedDate: 'DESC',
+                    },
+                    take: 9,
+                    skip: (page - 1) * 9,
                 },
-                take: 9,
-                skip: (page - 1) * 9,
-            });
-            const totalResults = await this.refVideos.count();
+            );
             return {
                 ok: true,
                 totalResults,
