@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Repository } from 'typeorm';
 import { RefVideoOutput } from './dtos/ref-video.dto';
 import { RefVideosInput, RefVideosOutput } from './dtos/ref-videos.dto';
 import { RefVideo } from './entities/ref-video.entity';
+import * as camelcaseKeys from 'camelcase-keys';
 
 @Injectable()
 export class RefVideosService {
@@ -12,23 +14,33 @@ export class RefVideosService {
         private readonly refVideos: Repository<RefVideo>,
     ) {}
 
-    async getRefVideos({ page }: RefVideosInput): Promise<RefVideosOutput> {
+    async allRefVideos({
+        page,
+        tagName,
+    }: RefVideosInput): Promise<RefVideosOutput> {
         try {
             if (!page) {
                 page = 1;
             }
-            const refVideos = await this.refVideos.find({
-                order: {
-                    updatedDate: 'DESC',
-                },
-                take: 9,
-                skip: (page - 1) * 9,
-            });
-            const totalResults = await this.refVideos.count();
+            if (!tagName) {
+                tagName = '';
+            }
+            const sql = `
+                SELECT DISTINCT * FROM ref_video
+                JOIN(SELECT rv_seq FROM ref_videos_tags AS RVT
+                    JOIN (SELECT tag_seq FROM tag WHERE tag_name ILIKE '%${tagName}%') 
+                    AS TAG
+                    ON TAG.tag_seq = RVT.tag_seq)
+                AS RVS
+                ON RVS.rv_seq = ref_video.rv_seq
+                ORDER BY ref_video.created_date DESC
+                LIMIT ${PaginationInput.take}
+                OFFSET ${PaginationInput.skip(page)}
+            `;
+            let refVideos = await this.refVideos.manager.query(sql);
+            refVideos = camelcaseKeys(refVideos);
             return {
                 ok: true,
-                totalResults,
-                totalPages: Math.ceil(totalResults / 9),
                 refVideos,
             };
         } catch (error) {
