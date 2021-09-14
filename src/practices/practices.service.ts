@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from 'src/members/entities/members.entity';
-import { getManager, getRepository, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import {
     CreatePracticeInput,
     CreatePracticeOutput,
@@ -28,8 +28,7 @@ export class PracticesService {
         member: Member,
     ): Promise<PracticesTodaySumOutput> {
         try {
-            const manager = getManager();
-            const result = await manager.query(
+            const result = await this.practices.manager.query(
                 `SELECT SUM(pt_finished - pt_started) FROM practice
                 WHERE practice.mbr_seq = ${member ? member.mbrSeq : 1}
                 AND date_trunc('day', pt_started) = CURRENT_DATE
