@@ -18,8 +18,4 @@ export class Tag extends CoreEntity {
     @Column({ name: 'tag_name', type: 'varchar', length: 255 })
     @IsString()
     tagName: string;
-
-    @ManyToMany((type) => RefVideo, (refVideo) => refVideo.tags)
-    @JoinTable()
-    refVideos: RefVideo[];
 }
