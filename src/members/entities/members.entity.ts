@@ -13,7 +13,6 @@ import {
     MemberPrivacyConsentCode,
     MemberVideoOptionCode,
 } from 'src/common/enums/code.enum';
-import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -70,10 +69,4 @@ export class Member extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.member)
     practices: Practice[];
-
-    @OneToMany(
-        (type) => MemberRefVideo,
-        (memberRefVideo) => memberRefVideo.member,
-    )
-    memberRefVideoes: MemberRefVideo[];
 }

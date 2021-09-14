@@ -5,7 +5,6 @@ import {
     RefVideoDifficultyCode,
     RefVideoSourceCode,
 } from 'src/common/enums/code.enum';
-import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import {
     Column,
@@ -70,12 +69,6 @@ export class RefVideo extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.refVideo)
     practices: Practice[];
-
-    @OneToMany(
-        (type) => MemberRefVideo,
-        (memberRefVideo) => memberRefVideo.refVideo,
-    )
-    memberRefVideoes: MemberRefVideo[];
 
     @ManyToMany((type) => Tag)
     @JoinTable({

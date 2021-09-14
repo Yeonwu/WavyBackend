@@ -10,7 +10,6 @@ import * as Joi from 'joi';
 import { Member } from './members/entities/members.entity';
 import { Group, GroupDetail } from './common/entities/code.entity';
 import { Analysis } from './analyses/entities/analyses.entity';
-import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
 import { Tag } from './ref-videos/entities/tag.entity';
@@ -46,7 +45,6 @@ import { Tag } from './ref-videos/entities/tag.entity';
                 Group,
                 GroupDetail,
                 Analysis,
-                MemberRefVideo,
                 Practice,
                 RefVideo,
                 Tag,
