@@ -65,10 +65,6 @@ export class RefVideo extends CoreEntity {
     @IsString()
     rvArtistName?: string;
 
-    @Column({ name: 'rv_genre', nullable: true, type: 'varchar', length: 255 })
-    @IsString()
-    rvGenre?: string;
-
     @OneToMany((type) => Analysis, (analysis) => analysis.refVideo)
     analyses: Analysis[];
 

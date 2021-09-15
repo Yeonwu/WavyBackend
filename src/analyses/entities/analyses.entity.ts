@@ -8,7 +8,7 @@ import {
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { AnalysisGradeCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
-import { RefVideo } from 'src/ref-videoes/entities/ref-video.entity';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
     Column,
     Entity,
