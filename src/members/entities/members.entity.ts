@@ -14,6 +14,8 @@ import {
     MemberVideoOptionCode,
 } from 'src/common/enums/code.enum';
 import { Practice } from 'src/practices/entities/practice.entity';
+import { MemberExpHistory } from './mbr-exp-history.entity';
+import { ApiProperty } from '@nestjs/swagger';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
     Column,
@@ -28,13 +30,16 @@ import {
 export class Member extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'mbr_seq', type: 'bigint' })
     @IsNumberString()
+    @ApiProperty()
     mbrSeq: string;
 
     @Column({ name: 'mbr_email', type: 'varchar', length: 255 })
+    @ApiProperty()
     @IsEmail()
     mbrEmail: string;
 
     @Column({ name: 'mbr_nickname', type: 'varchar', length: 255 })
+    @ApiProperty()
     @IsString()
     mbrNickname: string;
 
@@ -43,6 +48,7 @@ export class Member extends CoreEntity {
         type: 'varchar',
         length: 50,
     })
+    @ApiProperty()
     @IsEnum(MemberRefVideoIsBookmarkedCode)
     certificationMethodCode: string;
 
@@ -52,14 +58,17 @@ export class Member extends CoreEntity {
         length: 255,
         nullable: true,
     })
+    @ApiProperty()
     @IsUrl()
     profileImageUrl: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
+    @ApiProperty()
     @IsEnum(MemberPrivacyConsentCode)
     privacyConsentCode: string;
 
     @Column({ name: 'mbr_marketing_consent', type: 'varchar', length: 50 })
+    @ApiProperty()
     @IsEnum(MemberMarketingConsentCode)
     marketingConsentCode: string;
 
@@ -69,6 +78,7 @@ export class Member extends CoreEntity {
         length: 50,
         default: '40002',
     })
+    @ApiProperty()
     @IsEnum(MemberVideoOptionCode)
     videoOptionCode: string;
 
@@ -77,6 +87,18 @@ export class Member extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.member)
     practices: Practice[];
+
+    @OneToMany(
+        (type) => MemberRefVideo,
+        (memberRefVideo) => memberRefVideo.member,
+    )
+    memberRefVideoes: MemberRefVideo[];
+
+    @OneToMany(
+        (type) => MemberExpHistory,
+        (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
+    )
+    memberExpHistories: MemberExpHistory[];
 
     @ManyToMany((type) => RefVideo)
     @JoinTable({

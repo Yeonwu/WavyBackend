@@ -11,8 +11,10 @@ import { Member } from './members/entities/members.entity';
 import { Group, GroupDetail } from './common/entities/code.entity';
 import { Analysis } from './analyses/entities/analyses.entity';
 import { Practice } from './practices/entities/practice.entity';
+import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
-import { Tag } from './ref-videos/entities/tag.entity';
+import { Tag } from './tags/entities/tag.entity';
+import { TagsModule } from './tags/tags.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
@@ -43,6 +45,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
             logging: process.env.NODE_ENV !== 'prod',
             entities: [
                 Member,
+                MemberRefVideo,
+                MemberExpHistory,
                 Group,
                 GroupDetail,
                 Analysis,
@@ -56,6 +60,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
         AnalysesModule,
         RefVideosModule,
         CommonModule,
+        TagsModule,
         BookmarksModule,
     ],
     controllers: [],

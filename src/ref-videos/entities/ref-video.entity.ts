@@ -14,7 +14,7 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Tag } from './tag.entity';
+import { Tag } from '../../tags/entities/tag.entity';
 
 @Entity()
 export class RefVideo extends CoreEntity {
