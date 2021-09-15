@@ -42,7 +42,7 @@ export class RefVideosService {
                 OFFSET ${PaginationInput.skip(page)}
                 `;
             const sql2 = `
-                SELECT COUNT(DISTINCT ref_video.rv_seq) AS totalResults FROM ref_video
+                SELECT COUNT(DISTINCT ref_video.rv_seq) AS totalresults FROM ref_video
                 JOIN(SELECT rv_seq FROM ref_videos_tags AS RVT
                     JOIN (SELECT tag_seq FROM tag WHERE tag_name ILIKE '%${tagName}%') 
                     AS TAG
@@ -60,13 +60,13 @@ export class RefVideosService {
                 };
             }
             const refVideos = camelcaseKeys(sqlRawResults);
-            const { totalResults } = sql2RawResults[0];
-            const totalPages = Math.ceil(totalResults / PaginationInput.take);
+            const { totalresults } = sql2RawResults[0];
+            const totalPages = Math.ceil(totalresults / PaginationInput.take);
             return {
                 ok: true,
-                refVideos,
-                totalResults,
+                totalResults: +totalresults,
                 totalPages,
+                refVideos,
             };
         } catch (error) {
             return {
