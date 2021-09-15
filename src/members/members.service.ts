@@ -16,20 +16,23 @@ export class MembersService {
         private readonly configService: ConfigService,
     ) {}
     private buildMember(newMemberInput: CreateMemberInput) {
-        const newMember = this.members.create();
-        const adminMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+        try {
+            const newMember = this.members.create();
+            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
 
-        console.log(adminMbrSeq);
+            newMember.mbrEmail = newMemberInput.mbrEmail;
+            newMember.mbrNickname = newMemberInput.mbrNickname;
+            newMember.profileImageUrl = newMemberInput?.profileImageUrl;
+            newMember.certificationMethodCode =
+                newMemberInput.certificationMethodCode;
+            newMember.marketingConsentCode =
+                newMemberInput.certificationMethodCode;
+            newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
+            newMember.videoOptionCode = newMemberInput.videoOptionCode;
+            newMember.creatorSeq = systemMbrSeq;
 
-        newMember.mbrNickname = newMemberInput.mbrNickname;
-        newMember.profileImageUrl = newMemberInput?.profileImageUrl;
-        newMember.certificationMethodCode =
-            newMemberInput.certificationMethodCode;
-        newMember.marketingConsentCode = newMemberInput.certificationMethodCode;
-        newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
-        newMember.videoOptionCode = newMemberInput.videoOptionCode;
-
-        return newMember;
+            return newMember;
+        } catch (error) {}
     }
     private async saveMember(newMember: Member) {
         await this.members.save(newMember);
