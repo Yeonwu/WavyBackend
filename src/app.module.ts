@@ -45,7 +45,6 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
             logging: process.env.NODE_ENV !== 'prod',
             entities: [
                 Member,
-                MemberRefVideo,
                 MemberExpHistory,
                 Group,
                 GroupDetail,

@@ -89,12 +89,6 @@ export class Member extends CoreEntity {
     practices: Practice[];
 
     @OneToMany(
-        (type) => MemberRefVideo,
-        (memberRefVideo) => memberRefVideo.member,
-    )
-    memberRefVideoes: MemberRefVideo[];
-
-    @OneToMany(
         (type) => MemberExpHistory,
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
