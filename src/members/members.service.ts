@@ -15,29 +15,26 @@ export class MembersService {
         private readonly members: Repository<Member>,
         private readonly configService: ConfigService,
     ) {}
-    private buildMember(newMemberInput: CreateMemberInput) {
-        try {
-            const newMember = this.members.create();
-            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+    private buildMember(newMemberInput: CreateMemberInput): Member {
+        const newMember = this.members.create();
+        const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
 
-            newMember.mbrEmail = newMemberInput.mbrEmail;
-            newMember.mbrNickname = newMemberInput.mbrNickname;
-            newMember.profileImageUrl = newMemberInput?.profileImageUrl;
+        newMember.mbrEmail = newMemberInput.mbrEmail;
+        newMember.mbrNickname = newMemberInput.mbrNickname;
+        newMember.profileImageUrl = newMemberInput?.profileImageUrl;
 
-            newMember.certificationMethodCode =
-                newMemberInput.certificationMethodCode;
+        newMember.certificationMethodCode =
+            newMemberInput.certificationMethodCode;
 
-            newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
-            newMember.marketingConsentCode =
-                newMemberInput.certificationMethodCode;
+        newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
+        newMember.marketingConsentCode = newMemberInput.certificationMethodCode;
 
-            newMember.videoOptionCode = newMemberInput.videoOptionCode;
+        newMember.videoOptionCode = newMemberInput.videoOptionCode;
 
-            newMember.creatorSeq = systemMbrSeq;
-            newMember.updaterSeq = systemMbrSeq;
+        newMember.creatorSeq = systemMbrSeq;
+        newMember.updaterSeq = systemMbrSeq;
 
-            return newMember;
-        } catch (error) {}
+        return newMember;
     }
     private async saveMember(newMember: Member) {
         await this.members.save(newMember);
@@ -47,15 +44,10 @@ export class MembersService {
     ): Promise<CreateMemberOutput> {
         try {
             const newMember = this.buildMember(newMemberInput);
-            this.saveMember(newMember);
+            await this.saveMember(newMember);
             return { ok: true };
         } catch (error) {
-            console.error(error.message);
-
-            return {
-                ok: false,
-                error: '회원 등록에 실패하였습니다',
-            };
+            throw error;
         }
     }
 }

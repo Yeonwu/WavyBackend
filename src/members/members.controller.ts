@@ -3,6 +3,8 @@ import {
     Controller,
     Delete,
     Get,
+    HttpException,
+    HttpStatus,
     Param,
     Post,
     Put,
@@ -33,13 +35,13 @@ export class MembersController {
         @Body() createMemberInput: CreateMemberInput,
     ): Promise<CreateMemberOutput> {
         try {
-            return this.membersSerivce.createMember(createMemberInput);
+            await this.membersSerivce.createMember(createMemberInput);
+            return { ok: true };
         } catch (error) {
-            console.error(error.message);
-            return {
-                ok: false,
-                error: '회원 생성에 실패했습니다.',
-            };
+            throw new HttpException(
+                '회원등록에 실패했습니다.',
+                HttpStatus.BAD_REQUEST,
+            );
         }
     }
 
