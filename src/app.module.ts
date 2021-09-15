@@ -13,6 +13,7 @@ import { Analysis } from './analyses/entities/analyses.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
 import { Tag } from './ref-videos/entities/tag.entity';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
     imports: [
@@ -55,6 +56,7 @@ import { Tag } from './ref-videos/entities/tag.entity';
         AnalysesModule,
         RefVideosModule,
         CommonModule,
+        BookmarksModule,
     ],
     controllers: [],
     providers: [],
