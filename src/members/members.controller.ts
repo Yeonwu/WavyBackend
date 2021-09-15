@@ -19,18 +19,28 @@ import {
     UpdateMemberOutput,
 } from './dtos/update-member.dto';
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
+import { MembersService } from './members.service';
 
 @Controller('members')
 export class MembersController {
+    constructor(private readonly membersSerivce: MembersService) {}
     @Post('signup')
     @ApiCreatedResponse({
         description: '회원가입',
         type: CreateMemberOutput,
     })
-    createMember(
+    async createMember(
         @Body() createMemberInput: CreateMemberInput,
-    ): CreateMemberOutput {
-        return { success: true };
+    ): Promise<CreateMemberOutput> {
+        try {
+            return this.membersSerivce.createMember(createMemberInput);
+        } catch (error) {
+            console.error(error.message);
+            return {
+                success: false,
+                error: '회원 생성에 실패했습니다.',
+            };
+        }
     }
 
     @Get(':id')
