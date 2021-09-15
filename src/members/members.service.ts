@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -12,9 +13,11 @@ export class MembersService {
     constructor(
         @InjectRepository(Member)
         private readonly members: Repository<Member>,
+        private readonly configService: ConfigService,
     ) {}
     private buildMember(newMemberInput: CreateMemberInput) {
         const newMember = this.members.create();
+        const adminMbrSeq = this.configService.get('ADMIN_MBR_SEQ');
 
         newMember.mbrNickname = newMemberInput.mbrNickname;
         newMember.profileImageUrl = newMemberInput?.profileImageUrl;
