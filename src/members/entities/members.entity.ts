@@ -12,6 +12,7 @@ import {
     MemberMarketingConsentCode,
     MemberPrivacyConsentCode,
     MemberVideoOptionCode,
+    MemberCertificationMethodCode,
 } from 'src/common/enums/code.enum';
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
@@ -36,7 +37,7 @@ export class Member extends CoreEntity {
         type: 'varchar',
         length: 50,
     })
-    @IsEnum(MemberRefVideoIsBookmarkedCode)
+    @IsEnum(MemberCertificationMethodCode)
     certificationMethodCode: string;
 
     @Column({
