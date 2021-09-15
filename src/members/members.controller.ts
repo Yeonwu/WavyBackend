@@ -73,11 +73,26 @@ export class MembersController {
         description: '회원정보 수정',
         type: UpdateMemberOutput,
     })
-    updateMember(
-        @Param() params,
+    async updateMember(
+        @Param('id') id: number,
         @Body() updateMemberInput: UpdateMemberInput,
-    ): UpdateMemberOutput {
-        return { ok: true };
+    ): Promise<UpdateMemberOutput> {
+        try {
+            const member = await this.membersSerivce.updateMember(
+                id,
+                updateMemberInput,
+            );
+            return { ok: true };
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            } else {
+                throw new HttpException(
+                    '회원 정보 수정에 실패했습니다.',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        }
     }
 
     @Delete(':id')

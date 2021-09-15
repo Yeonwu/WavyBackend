@@ -6,6 +6,7 @@ import {
     CreateMemberInput,
     CreateMemberOutput,
 } from './dtos/create-member.dto';
+import { UpdateMemberInput } from './dtos/update-member.dto';
 import { Member } from './entities/members.entity';
 
 @Injectable()
@@ -60,6 +61,25 @@ export class MembersService {
                 );
             }
             return member;
+        } catch (error) {
+            throw error;
+        }
+    }
+    async updateMember(memberID: number, updateMemberInput: UpdateMemberInput) {
+        try {
+            const member = await this.getMemberByID(memberID);
+            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+
+            member.updaterSeq = systemMbrSeq;
+
+            member.mbrNickname =
+                updateMemberInput.mbrNickname ?? member.mbrNickname;
+            member.videoOptionCode =
+                updateMemberInput.videoOptionCode ?? member.videoOptionCode;
+            member.profileImageUrl =
+                updateMemberInput.profileImageUrl ?? member.profileImageUrl;
+
+            await this.members.save(member);
         } catch (error) {
             throw error;
         }
