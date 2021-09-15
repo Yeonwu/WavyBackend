@@ -14,7 +14,10 @@ export enum RefVideoSourceCode {
     WAVY = 'WAVY',
 }
 
-export enum PracticeVideoTypeCode {}
+export enum PracticeVideoTypeCode {
+    YOUTUBE = 'YOUTUBE',
+    REF_VIDEO = 'REF_VIDEO',
+}
 
 export enum AnalysisGradeCode {}
 
