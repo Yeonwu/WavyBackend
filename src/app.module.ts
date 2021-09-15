@@ -30,7 +30,7 @@ import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
-                ADMIN_MBR_SEQ: Joi.number().required(),
+                SYSTEM_MBR_SEQ: Joi.number().required(),
             }),
         }),
         TypeOrmModule.forRoot({

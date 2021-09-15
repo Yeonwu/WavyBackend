@@ -17,7 +17,9 @@ export class MembersService {
     ) {}
     private buildMember(newMemberInput: CreateMemberInput) {
         const newMember = this.members.create();
-        const adminMbrSeq = this.configService.get('ADMIN_MBR_SEQ');
+        const adminMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+
+        console.log(adminMbrSeq);
 
         newMember.mbrNickname = newMemberInput.mbrNickname;
         newMember.profileImageUrl = newMemberInput?.profileImageUrl;
