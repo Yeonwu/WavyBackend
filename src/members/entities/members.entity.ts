@@ -92,5 +92,5 @@ export class Member extends CoreEntity {
         (type) => MemberExpHistory,
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
-    memberExpHistory: MemberExpHistory;
+    memberExpHistories: MemberExpHistory[];
 }
