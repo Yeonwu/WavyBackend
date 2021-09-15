@@ -12,10 +12,10 @@ import { Group, GroupDetail } from './common/entities/code.entity';
 import { Analysis } from './analyses/entities/analyses.entity';
 import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
+import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { TagsModule } from './tags/tags.module';
-
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -44,10 +44,11 @@ import { TagsModule } from './tags/tags.module';
             logging: process.env.NODE_ENV !== 'prod',
             entities: [
                 Member,
+                MemberRefVideo,
+                MemberExpHistory,
                 Group,
                 GroupDetail,
                 Analysis,
-                MemberRefVideo,
                 Practice,
                 RefVideo,
                 Tag,

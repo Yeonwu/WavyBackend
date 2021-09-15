@@ -22,3 +22,6 @@ export enum PracticeVideoTypeCode {
 export enum AnalysisGradeCode {}
 
 export enum MemberRefVideoIsBookmarkedCode {}
+
+export enum MemberExpHistoryLevelCode {}
+export enum MemberExpHistoryTierCode {}
