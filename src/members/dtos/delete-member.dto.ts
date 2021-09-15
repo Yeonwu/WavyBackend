@@ -1,3 +1,3 @@
-import { CreateMemberOutput } from './create-member.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
-export class DeleteMemberOutput extends CreateMemberOutput {}
+export class DeleteMemberOutput extends CoreOutput {}

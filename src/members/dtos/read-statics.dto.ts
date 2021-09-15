@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateMemberOutput } from './create-member.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 class DancesGoodAt {
     @ApiProperty()
@@ -25,7 +25,7 @@ export class ReadStaticsEntity {
     @ApiProperty({ type: [DancesOften] })
     dancesOften: Array<DancesOften>;
 }
-export class ReadStaticsOuput extends CreateMemberOutput {
+export class ReadStaticsOuput extends CoreOutput {
     @ApiProperty()
     statics?: ReadStaticsEntity;
 }

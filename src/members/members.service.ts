@@ -23,13 +23,18 @@ export class MembersService {
             newMember.mbrEmail = newMemberInput.mbrEmail;
             newMember.mbrNickname = newMemberInput.mbrNickname;
             newMember.profileImageUrl = newMemberInput?.profileImageUrl;
+
             newMember.certificationMethodCode =
                 newMemberInput.certificationMethodCode;
+
+            newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
             newMember.marketingConsentCode =
                 newMemberInput.certificationMethodCode;
-            newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
+
             newMember.videoOptionCode = newMemberInput.videoOptionCode;
+
             newMember.creatorSeq = systemMbrSeq;
+            newMember.updaterSeq = systemMbrSeq;
 
             return newMember;
         } catch (error) {}
@@ -43,12 +48,12 @@ export class MembersService {
         try {
             const newMember = this.buildMember(newMemberInput);
             this.saveMember(newMember);
-            return { success: true };
+            return { ok: true };
         } catch (error) {
             console.error(error.message);
 
             return {
-                success: false,
+                ok: false,
                 error: '회원 등록에 실패하였습니다',
             };
         }

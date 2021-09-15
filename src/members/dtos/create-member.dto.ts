@@ -1,5 +1,6 @@
 import { Member } from '../entities/members.entity';
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 export class CreateMemberInput extends PickType(Member, [
     'mbrEmail',
@@ -10,10 +11,4 @@ export class CreateMemberInput extends PickType(Member, [
     'marketingConsentCode',
     'videoOptionCode',
 ]) {}
-export class CreateMemberOutput {
-    @ApiProperty()
-    success: boolean;
-
-    @ApiPropertyOptional()
-    error?: string;
-}
+export class CreateMemberOutput extends CoreOutput {}
