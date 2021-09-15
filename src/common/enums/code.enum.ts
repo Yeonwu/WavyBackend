@@ -3,10 +3,21 @@ export enum MemberMarketingConsentCode {}
 export enum MemberPrivacyConsentCode {}
 export enum MemberVideoOptionCode {}
 
-export enum RefVideoDifficultyCode {}
-export enum RefVideoSourceCode {}
+export enum RefVideoDifficultyCode {
+    EASY = 'EASY',
+    NORMAL = 'NORMAL',
+    DIFFICULT = 'DIFFICULT',
+}
+export enum RefVideoSourceCode {
+    YOUTUBE = 'YOUTUBE',
+    TICKTOK = 'TICKTOK',
+    WAVY = 'WAVY',
+}
 
-export enum PracticeVideoTypeCode {}
+export enum PracticeVideoTypeCode {
+    YOUTUBE = 'YOUTUBE',
+    REF_VIDEO = 'REF_VIDEO',
+}
 
 export enum AnalysisGradeCode {}
 
