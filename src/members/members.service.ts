@@ -6,7 +6,14 @@ import {
     CreateMemberInput,
     CreateMemberOutput,
 } from './dtos/create-member.dto';
-import { UpdateMemberInput } from './dtos/update-member.dto';
+import {
+    DeleteMemberOption,
+    DeleteMemberOutput,
+} from './dtos/delete-member.dto';
+import {
+    UpdateMemberInput,
+    UpdateMemberOutput,
+} from './dtos/update-member.dto';
 import { Member } from './entities/members.entity';
 
 @Injectable()
@@ -65,7 +72,10 @@ export class MembersService {
             throw error;
         }
     }
-    async updateMember(memberID: number, updateMemberInput: UpdateMemberInput) {
+    async updateMember(
+        memberID: number,
+        updateMemberInput: UpdateMemberInput,
+    ): Promise<UpdateMemberOutput> {
         try {
             const member = await this.getMemberByID(memberID);
             const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
@@ -80,6 +90,53 @@ export class MembersService {
                 updateMemberInput.profileImageUrl ?? member.profileImageUrl;
 
             await this.members.save(member);
+            return { ok: true };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    private async deleteMemberPrivateInfo(member) {
+        member.mbrEmail = '_';
+        member.mbrNickname = '_';
+        member.profileImageUrl = '_';
+        member.mbrDeleted = true;
+
+        await this.members.save(member);
+    }
+
+    async deleteMember(
+        memberID: number,
+        options?: DeleteMemberOption,
+    ): Promise<DeleteMemberOutput> {
+        try {
+            const member = await this.getMemberByID(memberID);
+
+            if (member.mbrDeleted) {
+                throw new HttpException(
+                    '존재하지 않는 회원입니다.',
+                    HttpStatus.NOT_FOUND,
+                );
+            }
+
+            await this.deleteMemberPrivateInfo(member);
+
+            if (options?.purge) {
+                /**
+                 * TODO:
+                 * Delete Every related
+                 *
+                 *  - Analyses
+                 *  - Practices
+                 *  - ExpHistories
+                 *  - Bookmarks
+                 *
+                 */
+
+                return { ok: true };
+            }
+
+            return { ok: true };
         } catch (error) {
             throw error;
         }

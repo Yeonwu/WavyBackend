@@ -78,10 +78,7 @@ export class MembersController {
         @Body() updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
-            const member = await this.membersSerivce.updateMember(
-                id,
-                updateMemberInput,
-            );
+            await this.membersSerivce.updateMember(id, updateMemberInput);
             return { ok: true };
         } catch (error) {
             if (error instanceof HttpException) {
@@ -101,8 +98,19 @@ export class MembersController {
         description: '회원 탈퇴',
         type: DeleteMemberOutput,
     })
-    deleteMember(@Param() params): DeleteMemberOutput {
-        return { ok: true };
+    async deleteMember(@Param('id') id: number): Promise<DeleteMemberOutput> {
+        try {
+            return await this.membersSerivce.deleteMember(id);
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            } else {
+                throw new HttpException(
+                    '회원 탈퇴에 실패했습니다.',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        }
     }
 
     @Get(':id/statics')

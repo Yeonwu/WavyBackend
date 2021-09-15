@@ -93,4 +93,7 @@ export class Member extends CoreEntity {
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
     memberExpHistories: MemberExpHistory[];
+
+    @Column({ name: 'mbr_deleted', type: 'boolean', default: false })
+    mbrDeleted: boolean;
 }
