@@ -13,7 +13,8 @@ import { Analysis } from './analyses/entities/analyses.entity';
 import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
-import { Tag } from './ref-videos/entities/tag.entity';
+import { Tag } from './tags/entities/tag.entity';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
     imports: [
@@ -57,6 +58,7 @@ import { Tag } from './ref-videos/entities/tag.entity';
         AnalysesModule,
         RefVideosModule,
         CommonModule,
+        TagsModule,
     ],
     controllers: [],
     providers: [],
