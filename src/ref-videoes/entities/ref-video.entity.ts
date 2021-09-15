@@ -7,7 +7,15 @@ import {
 } from 'src/common/enums/code.enum';
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Tag } from './tag.entity';
 
 @Entity()
 export class RefVideo extends CoreEntity {
@@ -72,4 +80,8 @@ export class RefVideo extends CoreEntity {
         (memberRefVideo) => memberRefVideo.refVideo,
     )
     memberRefVideoes: MemberRefVideo[];
+
+    @ManyToMany((type) => Tag, (tag) => tag.refVideos)
+    @JoinTable()
+    tags: Tag[];
 }
