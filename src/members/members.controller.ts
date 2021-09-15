@@ -14,7 +14,7 @@ import {
     CreateMemberOutput,
 } from './dtos/create-member.dto';
 import { DeleteMemberOutput } from './dtos/delete-member.dto';
-import { ReadMemberOutput } from './dtos/read-member.dto';
+import { GetMemberOutput } from './dtos/get-member.dto';
 import { ReadStaticsOuput } from './dtos/read-statics.dto';
 import {
     UpdateMemberInput,
@@ -49,10 +49,22 @@ export class MembersController {
     @ApiResponse({
         status: 200,
         description: '회원정보 조회',
-        type: ReadMemberOutput,
+        type: GetMemberOutput,
     })
-    readMember(@Param() params): ReadMemberOutput {
-        return { ok: true };
+    async getMemberByID(@Param('id') id: number): Promise<GetMemberOutput> {
+        try {
+            const member = await this.membersSerivce.getMemberByID(id);
+            return { ok: true, member };
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            } else {
+                throw new HttpException(
+                    '회원 조회에 실패했습니다.',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        }
     }
 
     @Put(':id')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -46,6 +46,20 @@ export class MembersService {
             const newMember = this.buildMember(newMemberInput);
             await this.saveMember(newMember);
             return { ok: true };
+        } catch (error) {
+            throw error;
+        }
+    }
+    async getMemberByID(memberID: number): Promise<Member> {
+        try {
+            const member = await this.members.findOne(memberID);
+            if (!member) {
+                throw new HttpException(
+                    '존재하지 않는 회원입니다.',
+                    HttpStatus.NOT_FOUND,
+                );
+            }
+            return member;
         } catch (error) {
             throw error;
         }
