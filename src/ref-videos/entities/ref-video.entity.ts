@@ -77,7 +77,17 @@ export class RefVideo extends CoreEntity {
     )
     memberRefVideoes: MemberRefVideo[];
 
-    @ManyToMany((type) => Tag, (tag) => tag.refVideos)
-    @JoinTable()
+    @ManyToMany((type) => Tag)
+    @JoinTable({
+        name: 'ref_videos_tags',
+        joinColumn: {
+            name: 'rv_seq',
+            referencedColumnName: 'rvSeq',
+        },
+        inverseJoinColumn: {
+            name: 'tag_seq',
+            referencedColumnName: 'tagSeq',
+        },
+    })
     tags: Tag[];
 }
