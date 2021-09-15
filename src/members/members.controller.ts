@@ -37,7 +37,7 @@ export class MembersController {
         } catch (error) {
             console.error(error.message);
             return {
-                success: false,
+                ok: false,
                 error: '회원 생성에 실패했습니다.',
             };
         }
@@ -50,7 +50,7 @@ export class MembersController {
         type: ReadMemberOutput,
     })
     readMember(@Param() params): ReadMemberOutput {
-        return { success: true };
+        return { ok: true };
     }
 
     @Put(':id')
@@ -63,7 +63,7 @@ export class MembersController {
         @Param() params,
         @Body() updateMemberInput: UpdateMemberInput,
     ): UpdateMemberOutput {
-        return { success: true };
+        return { ok: true };
     }
 
     @Delete(':id')
@@ -73,7 +73,7 @@ export class MembersController {
         type: DeleteMemberOutput,
     })
     deleteMember(@Param() params): DeleteMemberOutput {
-        return { success: true };
+        return { ok: true };
     }
 
     @Get(':id/statics')
@@ -83,6 +83,6 @@ export class MembersController {
         type: ReadStaticsOuput,
     })
     readStatics(@Param() params): ReadStaticsOuput {
-        return { success: true };
+        return { ok: true };
     }
 }
