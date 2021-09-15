@@ -14,7 +14,15 @@ import {
     MemberVideoOptionCode,
 } from 'src/common/enums/code.enum';
 import { Practice } from 'src/practices/entities/practice.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Member extends CoreEntity {
@@ -69,4 +77,18 @@ export class Member extends CoreEntity {
 
     @OneToMany((type) => Practice, (practice) => practice.member)
     practices: Practice[];
+
+    @ManyToMany((type) => RefVideo)
+    @JoinTable({
+        name: 'bookmarks',
+        joinColumn: {
+            name: 'mbr_seq',
+            referencedColumnName: 'mbrSeq',
+        },
+        inverseJoinColumn: {
+            name: 'rv_seq',
+            referencedColumnName: 'rvSeq',
+        },
+    })
+    bookmarkedRefVideos: RefVideo[];
 }
