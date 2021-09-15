@@ -20,7 +20,7 @@ export class MemberExpHistory extends CoreEntity {
     @IsNumberString()
     mehSeq: number;
 
-    @ManyToOne((type) => Member, (member) => member.memberExpHistory)
+    @ManyToOne((type) => Member, (member) => member.memberExpHistories)
     @JoinColumn({ name: 'mbr_seq' })
     member: Member;
 
