@@ -8,6 +8,7 @@ import {
     Param,
     Post,
     Put,
+    Query,
 } from '@nestjs/common';
 import {
     CreateMemberInput,
@@ -15,20 +16,24 @@ import {
 } from './dtos/create-member.dto';
 import { DeleteMemberOutput } from './dtos/delete-member.dto';
 import { GetMemberOutput } from './dtos/get-member.dto';
-import { ReadStaticsOuput } from './dtos/read-statics.dto';
+import { GetStaticsOuput } from './dtos/get-statics.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
 } from './dtos/update-member.dto';
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
 import { MembersService } from './members.service';
+import { MbrStaticsSerivce } from './mbr-statics.service';
 
 @Controller('members')
 export class MembersController {
-    constructor(private readonly membersSerivce: MembersService) {}
+    constructor(
+        private readonly membersSerivce: MembersService,
+        private readonly mbrStaticsService: MbrStaticsSerivce,
+    ) {}
     @Post('signup')
     @ApiCreatedResponse({
-        description: '회원가입',
+        description: '회원가입 API',
         type: CreateMemberOutput,
     })
     async createMember(
@@ -48,7 +53,7 @@ export class MembersController {
     @Get(':id')
     @ApiResponse({
         status: 200,
-        description: '회원정보 조회',
+        description: '회원정보 조회 API',
         type: GetMemberOutput,
     })
     async getMemberByID(@Param('id') id: number): Promise<GetMemberOutput> {
@@ -73,7 +78,7 @@ export class MembersController {
     @Put(':id')
     @ApiResponse({
         status: 200,
-        description: '회원정보 수정',
+        description: '회원정보 수정 API',
         type: UpdateMemberOutput,
     })
     async updateMember(
@@ -98,7 +103,7 @@ export class MembersController {
     @Delete(':id')
     @ApiResponse({
         status: 200,
-        description: '회원 탈퇴',
+        description: '회원 탈퇴 API',
         type: DeleteMemberOutput,
     })
     async deleteMember(@Param('id') id: number): Promise<DeleteMemberOutput> {
@@ -119,10 +124,28 @@ export class MembersController {
     @Get(':id/statics')
     @ApiResponse({
         status: 200,
-        description: '회원 통계 조회',
-        type: ReadStaticsOuput,
+        description: '회원 통계 조회 API',
+        type: GetStaticsOuput,
     })
-    readStatics(@Param() params): ReadStaticsOuput {
-        return { ok: true };
+    async getStatics(
+        @Param('id') id: number,
+        @Query('dancegoodlimit') dancesGoodAtLimit?: number,
+        @Query('danceoftenlimit') dancesOftenLimit?: number,
+    ): Promise<GetStaticsOuput> {
+        try {
+            return await this.mbrStaticsService.getStatics(id, {
+                dancesGoodAtLimit: dancesGoodAtLimit || null,
+                dancesOftenLimit: dancesOftenLimit || null,
+            });
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            } else {
+                throw new HttpException(
+                    '회원 통계 조회에 실패했습니다.',
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+        }
     }
 }
