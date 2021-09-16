@@ -13,11 +13,18 @@ import {
     MemberPrivacyConsentCode,
     MemberVideoOptionCode,
 } from 'src/common/enums/code.enum';
-import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MemberExpHistory } from './mbr-exp-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Member extends CoreEntity {
@@ -82,14 +89,22 @@ export class Member extends CoreEntity {
     practices: Practice[];
 
     @OneToMany(
-        (type) => MemberRefVideo,
-        (memberRefVideo) => memberRefVideo.member,
-    )
-    memberRefVideoes: MemberRefVideo[];
-
-    @OneToMany(
         (type) => MemberExpHistory,
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
     memberExpHistories: MemberExpHistory[];
+
+    @ManyToMany((type) => RefVideo)
+    @JoinTable({
+        name: 'bookmarks',
+        joinColumn: {
+            name: 'mbr_seq',
+            referencedColumnName: 'mbrSeq',
+        },
+        inverseJoinColumn: {
+            name: 'rv_seq',
+            referencedColumnName: 'rvSeq',
+        },
+    })
+    bookmarkedRefVideos: RefVideo[];
 }
