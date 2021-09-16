@@ -53,9 +53,12 @@ export class MembersController {
     })
     async getMemberByID(@Param('id') id: number): Promise<GetMemberOutput> {
         try {
-            const member = await this.membersSerivce.getMemberByID(id);
+            const member = await this.membersSerivce.getMemberBySeq(id);
             return { ok: true, member };
         } catch (error) {
+            // 센트리 / 뉴렐릭 => 유료, 무료.
+            // 500에러 & 정돈된 에러 메세지 | 홈으로 이동 등등...
+            // 로그 남기기.
             if (error instanceof HttpException) {
                 throw error;
             } else {

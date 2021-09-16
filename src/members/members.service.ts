@@ -58,9 +58,9 @@ export class MembersService {
             throw error;
         }
     }
-    async getMemberByID(memberID: number): Promise<Member> {
+    async getMemberBySeq(memberSeq: number): Promise<Member> {
         try {
-            const member = await this.members.findOne(memberID);
+            const member = await this.members.findOne(memberSeq);
             if (!member) {
                 throw new HttpException(
                     '존재하지 않는 회원입니다.',
@@ -69,15 +69,16 @@ export class MembersService {
             }
             return member;
         } catch (error) {
+            error.message = `${memberSeq}에서 에러..`;
             throw error;
         }
     }
     async updateMember(
-        memberID: number,
+        memberSeq: number,
         updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
-            const member = await this.getMemberByID(memberID);
+            const member = await this.getMemberBySeq(memberSeq);
             const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
 
             member.updaterSeq = systemMbrSeq;
@@ -106,11 +107,11 @@ export class MembersService {
     }
 
     async deleteMember(
-        memberID: number,
+        memberSeq: number,
         options?: DeleteMemberOption,
     ): Promise<DeleteMemberOutput> {
         try {
-            const member = await this.getMemberByID(memberID);
+            const member = await this.getMemberBySeq(memberSeq);
 
             if (member.mbrDeleted) {
                 throw new HttpException(
@@ -141,4 +142,6 @@ export class MembersService {
             throw error;
         }
     }
+
+    async;
 }
