@@ -16,6 +16,7 @@ import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { TagsModule } from './tags/tags.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -31,6 +32,8 @@ import { TagsModule } from './tags/tags.module';
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
+                KAKAO_CLIENT_ID: Joi.string().required(),
+                BASE_DOMAIN: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({
@@ -60,6 +63,7 @@ import { TagsModule } from './tags/tags.module';
         RefVideosModule,
         CommonModule,
         TagsModule,
+        AuthModule,
     ],
     controllers: [],
     providers: [],
