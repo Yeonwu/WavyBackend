@@ -11,4 +11,7 @@ export class CreateMemberInput extends PickType(Member, [
     'marketingConsentCode',
     'videoOptionCode',
 ]) {}
-export class CreateMemberOutput extends CoreOutput {}
+export class CreateMemberOutput extends CoreOutput {
+    @ApiProperty()
+    member?: Member;
+}

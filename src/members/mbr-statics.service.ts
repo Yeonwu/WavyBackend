@@ -20,10 +20,16 @@ export class MbrStaticsSerivce {
         this.manager = this.members.manager;
     }
     private intervalToString(interval: any): string {
-        const { hours, minutes, seconds } = interval[0]['sum'];
-        const fhours = hours ? hours.toString().padStart(2, '0') : '00';
-        const fminutes = minutes ? minutes.toString().padStart(2, '0') : '00';
-        const fseconds = seconds ? seconds.toString().padStart(2, '0') : '00';
+        const finterval = interval[0]['sum'];
+        const fhours = finterval?.hours
+            ? finterval?.hours.toString().padStart(2, '0')
+            : '00';
+        const fminutes = finterval?.minutes
+            ? finterval?.minutes.toString().padStart(2, '0')
+            : '00';
+        const fseconds = finterval?.seconds
+            ? finterval?.seconds.toString().padStart(2, '0')
+            : '00';
         return `${fhours}:${fminutes}:${fseconds}`;
     }
 
@@ -52,7 +58,8 @@ export class MbrStaticsSerivce {
         const favorateDancerQueryResult = await this.manager.query(
             getFavorateDancerSQL,
         );
-        const favorateDancer = favorateDancerQueryResult[0]['rv_artist_name'];
+        const favorateDancer =
+            favorateDancerQueryResult[0]?.rv_artist_name ?? '';
         return favorateDancer;
     }
 
@@ -105,36 +112,45 @@ export class MbrStaticsSerivce {
         memberSeq: number,
         options?: GetStaticsOptions,
     ): Promise<GetStaticsOuput> {
-        /**
-         * Checks if member exists.
-         * If not, it thorws 404 HttpException.
-         */
-        await this.memberService.getMemberBySeq(memberSeq);
+        try {
+            const getMemberResult = await this.memberService.getMemberBySeq(
+                memberSeq,
+            );
+            if (!getMemberResult.ok) {
+                return getMemberResult;
+            }
 
-        const totalPracticeTime: string = await this.getTotalPracticeTime(
-            memberSeq,
-        );
+            const totalPracticeTime: string = await this.getTotalPracticeTime(
+                memberSeq,
+            );
 
-        const favorateDancer: string = await this.getFavorateDancer(memberSeq);
+            const favorateDancer: string = await this.getFavorateDancer(
+                memberSeq,
+            );
 
-        const dancesGoodAt: Array<DancesGoodAt> = await this.getDancesGoodAt(
-            memberSeq,
-            options.dancesGoodAtLimit ?? 5,
-        );
+            const dancesGoodAt: Array<DancesGoodAt> =
+                await this.getDancesGoodAt(
+                    memberSeq,
+                    options.dancesGoodAtLimit ?? 5,
+                );
 
-        const dancesOften: Array<DancesOften> = await this.getDancesOften(
-            memberSeq,
-            options.dancesOftenLimit ?? 5,
-        );
+            const dancesOften: Array<DancesOften> = await this.getDancesOften(
+                memberSeq,
+                options.dancesOftenLimit ?? 5,
+            );
 
-        return {
-            ok: true,
-            statics: {
-                totalPracticeTime,
-                favorateDancer,
-                dancesGoodAt,
-                dancesOften,
-            },
-        };
+            return {
+                ok: true,
+                statics: {
+                    totalPracticeTime,
+                    favorateDancer,
+                    dancesGoodAt,
+                    dancesOften,
+                },
+            };
+        } catch (error) {
+            console.log(error.message);
+            return { ok: false, error: '회원 통계 조회에 실패했습니다.' };
+        }
     }
 }

@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import e from 'express';
+import { number } from 'joi';
 import { Repository } from 'typeorm';
 import {
     CreateMemberInput,
@@ -10,6 +12,7 @@ import {
     DeleteMemberOption,
     DeleteMemberOutput,
 } from './dtos/delete-member.dto';
+import { GetMemberOutput } from './dtos/get-member.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
@@ -53,24 +56,26 @@ export class MembersService {
         try {
             const newMember = this.buildMember(newMemberInput);
             await this.saveMember(newMember);
-            return { ok: true };
+            return { ok: true, member: newMember };
         } catch (error) {
-            throw error;
+            console.log(error.message);
+            return { ok: false, error: '회원가입에 실패했습니다.' };
         }
     }
-    async getMemberBySeq(memberSeq: number): Promise<Member> {
+    async getMemberBySeq(memberSeq: number): Promise<GetMemberOutput> {
         try {
             const member = await this.members.findOne(memberSeq);
-            if (!member) {
-                throw new HttpException(
-                    '존재하지 않는 회원입니다.',
-                    HttpStatus.NOT_FOUND,
-                );
+
+            const MEMBER_NOT_EXISTS = !member;
+            const IS_MEMBER_DELETED = member?.mbrDeleted;
+
+            if (MEMBER_NOT_EXISTS || IS_MEMBER_DELETED) {
+                return { ok: false, error: '존재하지 않는 회원입니다.' };
             }
-            return member;
+            return { ok: true, member };
         } catch (error) {
-            error.message = `${memberSeq}에서 에러..`;
-            throw error;
+            console.log(error.message);
+            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         }
     }
     async updateMember(
@@ -78,8 +83,13 @@ export class MembersService {
         updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
-            const member = await this.getMemberBySeq(memberSeq);
+            const getMemberResult = await this.getMemberBySeq(memberSeq);
+            const member = getMemberResult?.member;
             const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+
+            if (getMemberResult.ok) {
+                return getMemberResult;
+            }
 
             member.updaterSeq = systemMbrSeq;
 
@@ -93,7 +103,7 @@ export class MembersService {
             await this.members.save(member);
             return { ok: true };
         } catch (error) {
-            throw error;
+            return { ok: false, error: '회원 정보 수정에 실패했습니다.' };
         }
     }
 
@@ -111,16 +121,13 @@ export class MembersService {
         options?: DeleteMemberOption,
     ): Promise<DeleteMemberOutput> {
         try {
-            const member = await this.getMemberBySeq(memberSeq);
+            const getMemberResult = await this.getMemberBySeq(memberSeq);
 
-            if (member.mbrDeleted) {
-                throw new HttpException(
-                    '존재하지 않는 회원입니다.',
-                    HttpStatus.NOT_FOUND,
-                );
+            if (!getMemberResult.ok) {
+                return getMemberResult;
             }
 
-            await this.deleteMemberPrivateInfo(member);
+            await this.deleteMemberPrivateInfo(getMemberResult.member);
 
             if (options?.purge) {
                 /**
@@ -139,9 +146,7 @@ export class MembersService {
 
             return { ok: true };
         } catch (error) {
-            throw error;
+            return { ok: false, error: '회원 정보 삭제에 실패했습니다.' };
         }
     }
-
-    async;
 }
