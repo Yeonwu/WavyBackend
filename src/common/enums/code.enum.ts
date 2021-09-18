@@ -1,7 +1,15 @@
-export enum MemberCertificationMethodCode {}
-export enum MemberMarketingConsentCode {}
-export enum MemberPrivacyConsentCode {}
-export enum MemberVideoOptionCode {}
+export enum MemberCertificationMethodCode {
+    'test',
+}
+export enum MemberMarketingConsentCode {
+    'test',
+}
+export enum MemberPrivacyConsentCode {
+    'test',
+}
+export enum MemberVideoOptionCode {
+    'test',
+}
 
 export enum RefVideoDifficultyCode {
     EASY = 'EASY',

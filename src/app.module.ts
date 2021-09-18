@@ -32,6 +32,7 @@ import { AuthModule } from './auth/auth.module';
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
+                SYSTEM_MBR_SEQ: Joi.number().required(),
                 KAKAO_CLIENT_ID: Joi.string().required(),
                 BASE_DOMAIN: Joi.string().required(),
             }),

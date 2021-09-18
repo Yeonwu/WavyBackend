@@ -1,7 +1,9 @@
 import {
     IsEmail,
     IsEnum,
+    IsNumber,
     IsNumberString,
+    IsOptional,
     IsString,
     IsUrl,
 } from 'class-validator';
@@ -12,6 +14,7 @@ import {
     MemberMarketingConsentCode,
     MemberPrivacyConsentCode,
     MemberVideoOptionCode,
+    MemberCertificationMethodCode,
 } from 'src/common/enums/code.enum';
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
@@ -31,6 +34,11 @@ export class Member extends CoreEntity {
     @IsEmail()
     mbrEmail: string;
 
+    @Column({ name: 'mbr_kakao_seq', type: 'bigint', nullable: true })
+    @IsOptional()
+    @IsNumber()
+    mbrKakaoSeq: string;
+
     @Column({ name: 'mbr_nickname', type: 'varchar', length: 255 })
     @ApiProperty()
     @IsString()
@@ -42,7 +50,7 @@ export class Member extends CoreEntity {
         length: 50,
     })
     @ApiProperty()
-    @IsEnum(MemberRefVideoIsBookmarkedCode)
+    @IsEnum(MemberCertificationMethodCode)
     certificationMethodCode: string;
 
     @Column({
@@ -92,4 +100,7 @@ export class Member extends CoreEntity {
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
     memberExpHistories: MemberExpHistory[];
+
+    @Column({ name: 'mbr_deleted', type: 'boolean', default: false })
+    mbrDeleted: boolean;
 }
