@@ -2,10 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { GetTokenPostData } from './dtos/get-token.dto';
 import got from 'got';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Member } from 'src/members/entities/members.entity';
+import { Repository } from 'typeorm';
+import { compile, options } from 'joi';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwtServce: JwtService) {}
+    constructor(
+        private readonly jwtServce: JwtService,
+        @InjectRepository(Member)
+        private readonly members: Repository<Member>,
+    ) {}
     async getToken(url: string, data: GetTokenPostData) {
         try {
             console.log(data);
@@ -25,15 +33,26 @@ export class AuthService {
                 .json();
             const accessToken = getAccessToken.access_token;
 
-            const getUserId: any = await got
+            const getKakaoMbrSeq: any = await got
                 .get('https://kapi.kakao.com/v2/user/me', {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 })
                 .json();
 
-            const jwtToken = this.jwtServce.sign({});
+            const member = await this.members.findOne({
+                where: {
+                    mbrKakaoSeq: getKakaoMbrSeq.id,
+                },
+            });
+            console.log(member);
 
-            return accessToken;
+            const jwtToken = this.jwtServce.sign({
+                mbrSeq: member.mbrSeq,
+                accessToken,
+            });
+            console.log(jwtToken);
+
+            return jwtToken;
         } catch (error) {
             console.log(error);
             return {
@@ -42,4 +61,5 @@ export class AuthService {
             };
         }
     }
+    async unlinkToken(url: string) {}
 }

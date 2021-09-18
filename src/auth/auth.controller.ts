@@ -36,6 +36,14 @@ export class AuthController {
         return res.redirect(url);
     }
 
+    // @Get('kakaoLogout')
+    // getKakaoLogout() {
+    //     const _hostName = 'kauth.kakao.com';
+    //     const _restApiKey = this.configService.get('KAKAO_CLIENT_ID');
+    //     const url = `https://${_hostName}/v1/user/unlink`;
+
+    // }
+
     @Get('kakaoLoginRedirect')
     kakaoLoginRedirect(
         @Query('code') code: string,

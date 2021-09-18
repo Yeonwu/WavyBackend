@@ -1,8 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import e from 'express';
-import { number } from 'joi';
 import { Repository } from 'typeorm';
 import {
     CreateMemberInput,
@@ -12,7 +10,7 @@ import {
     DeleteMemberOption,
     DeleteMemberOutput,
 } from './dtos/delete-member.dto';
-import { GetMemberOutput } from './dtos/get-member.dto';
+import { GetMemberEntity, GetMemberOutput } from './dtos/get-member.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
@@ -72,6 +70,9 @@ export class MembersService {
             if (MEMBER_NOT_EXISTS || IS_MEMBER_DELETED) {
                 return { ok: false, error: '존재하지 않는 회원입니다.' };
             }
+
+            member.mbrKakaoSeq = undefined;
+
             return { ok: true, member };
         } catch (error) {
             console.log(error.message);
