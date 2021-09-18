@@ -10,7 +10,7 @@ export class DancesGoodAt {
 
     @ApiProperty()
     @IsNumber()
-    score: number;
+    averageScore: number;
 }
 
 export class DancesOften {

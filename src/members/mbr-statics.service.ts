@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as camelcaseKeys from 'camelcase-keys';
 import { EntityManager, Repository } from 'typeorm';
 import {
     DancesGoodAt,
@@ -70,19 +71,23 @@ export class MbrStaticsSerivce {
         const getDancesGoodAtSQL = `
         SELECT 
             rv.rv_song_name AS name, 
-            ROUND(AVG(an.an_score)) AS score
+            ROUND(AVG(an.an_score)) AS average_score
         FROM analysis AS an
         JOIN ref_video AS rv
             ON an.rv_seq = rv.rv_seq
         WHERE an.mbr_seq = ${memberSeq}
         GROUP BY rv.rv_seq
-        ORDER BY score DESC
+        ORDER BY average_score DESC
         LIMIT ${limit}
         `;
         const getDancesGoodAtQueryResult = await this.manager.query(
             getDancesGoodAtSQL,
         );
-        const dancesGoodAt: Array<DancesGoodAt> = getDancesGoodAtQueryResult;
+
+        const dancesGoodAt: Array<DancesGoodAt> = camelcaseKeys(
+            getDancesGoodAtQueryResult,
+            { deep: true },
+        );
         return dancesGoodAt;
     }
 
