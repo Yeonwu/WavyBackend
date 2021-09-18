@@ -1,7 +1,9 @@
 import {
     IsEmail,
     IsEnum,
+    IsNumber,
     IsNumberString,
+    IsOptional,
     IsString,
     IsUrl,
 } from 'class-validator';
@@ -31,6 +33,11 @@ export class Member extends CoreEntity {
     @ApiProperty()
     @IsEmail()
     mbrEmail: string;
+
+    @Column({ name: 'mbr_kakao_seq', type: 'bigint', nullable: true })
+    @IsOptional()
+    @IsNumber()
+    mbrKakaoSeq: string;
 
     @Column({ name: 'mbr_nickname', type: 'varchar', length: 255 })
     @ApiProperty()
