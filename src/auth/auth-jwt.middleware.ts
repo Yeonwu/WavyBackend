@@ -14,21 +14,23 @@ export class JwtMiddleware implements NestMiddleware {
             if ('x-jwt' in req.headers) {
                 const token = req.headers['x-jwt'].toString();
                 const decoded = this.jwtService.verify(token);
+
                 if (
                     typeof decoded === 'object' &&
                     decoded.hasOwnProperty('mbrSeq')
                 ) {
                     const member = await this.memberService.getMemberBySeq(
-                        decoded['mbrSeq'],
+                        decoded.mbrSeq,
                     );
-                    req['member'] = member;
-                    console.log(decoded);
-                    req['accessToken'] = decoded['accessToken'];
+
+                    req.body.member = member;
+                    req.body.accessToken = decoded.accessToken;
                 }
             }
         } catch (error) {
             console.log(error.message);
-            req['member'] = null;
+            req.body.member = null;
+            req.body.accessToken = null;
         } finally {
             next();
         }

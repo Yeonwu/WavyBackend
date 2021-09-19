@@ -7,7 +7,6 @@ import {
     Post,
     Put,
     Query,
-    UseGuards,
 } from '@nestjs/common';
 import {
     CreateMemberInput,
@@ -23,7 +22,6 @@ import {
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { MbrStaticsSerivce } from './mbr-statics.service';
-import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('members')
 export class MembersController {
@@ -48,7 +46,7 @@ export class MembersController {
         description: '회원정보 조회 API',
         type: GetMemberOutput,
     })
-    async getMemberByID(@Param('id') id: number): Promise<GetMemberOutput> {
+    async getMemberByID(@Param('id') id: string): Promise<GetMemberOutput> {
         return await this.membersSerivce.getMemberBySeq(id);
     }
 
@@ -59,7 +57,7 @@ export class MembersController {
         type: UpdateMemberOutput,
     })
     async updateMember(
-        @Param('id') id: number,
+        @Param('id') id: string,
         @Body() updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         return await this.membersSerivce.updateMember(id, updateMemberInput);
@@ -71,7 +69,7 @@ export class MembersController {
         description: '회원 탈퇴 API',
         type: DeleteMemberOutput,
     })
-    async deleteMember(@Param('id') id: number): Promise<DeleteMemberOutput> {
+    async deleteMember(@Param('id') id: string): Promise<DeleteMemberOutput> {
         return await this.membersSerivce.deleteMember(id);
     }
 
@@ -82,7 +80,7 @@ export class MembersController {
         type: GetStaticsOuput,
     })
     async getStatics(
-        @Param('id') id: number,
+        @Param('id') id: string,
         @Query('dancegoodlimit') dancesGoodAtLimit?: number,
         @Query('danceoftenlimit') dancesOftenLimit?: number,
     ): Promise<GetStaticsOuput> {

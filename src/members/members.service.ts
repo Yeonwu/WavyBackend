@@ -10,7 +10,7 @@ import {
     DeleteMemberOption,
     DeleteMemberOutput,
 } from './dtos/delete-member.dto';
-import { GetMemberEntity, GetMemberOutput } from './dtos/get-member.dto';
+import { GetMemberOutput } from './dtos/get-member.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
@@ -24,6 +24,7 @@ export class MembersService {
         private readonly members: Repository<Member>,
         private readonly configService: ConfigService,
     ) {}
+
     private buildMember(newMemberInput: CreateMemberInput): Member {
         const newMember = this.members.create();
         const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
@@ -45,9 +46,11 @@ export class MembersService {
 
         return newMember;
     }
+
     private async saveMember(newMember: Member) {
         await this.members.save(newMember);
     }
+
     async createMember(
         newMemberInput: CreateMemberInput,
     ): Promise<CreateMemberOutput> {
@@ -60,14 +63,19 @@ export class MembersService {
             return { ok: false, error: '회원가입에 실패했습니다.' };
         }
     }
-    async getMemberBySeq(memberSeq: number): Promise<GetMemberOutput> {
+
+    private checkMemberExists(member: Member) {
+        const MEMBER_EXISTS = !member;
+        const IS_MEMBER_NOT_DELETED = member?.mbrDeleted;
+
+        return MEMBER_EXISTS && IS_MEMBER_NOT_DELETED;
+    }
+
+    async getMemberBySeq(memberSeq: string): Promise<GetMemberOutput> {
         try {
             const member = await this.members.findOne(memberSeq);
 
-            const MEMBER_NOT_EXISTS = !member;
-            const IS_MEMBER_DELETED = member?.mbrDeleted;
-
-            if (MEMBER_NOT_EXISTS || IS_MEMBER_DELETED) {
+            if (this.checkMemberExists(member)) {
                 return { ok: false, error: '존재하지 않는 회원입니다.' };
             }
 
@@ -79,8 +87,28 @@ export class MembersService {
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         }
     }
+
+    async getMemberByKakaoSeq(mbrKakaoSeq: string) {
+        try {
+            const member = await this.members.findOne({
+                where: {
+                    mbrKakaoSeq,
+                },
+            });
+
+            if (this.checkMemberExists(member)) {
+                return { ok: false, error: '존재하지 않는 회원입니다.' };
+            }
+
+            member.mbrKakaoSeq = undefined;
+            return { ok: true, member };
+        } catch (error) {
+            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
+        }
+    }
+
     async updateMember(
-        memberSeq: number,
+        memberSeq: string,
         updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
@@ -118,7 +146,7 @@ export class MembersService {
     }
 
     async deleteMember(
-        memberSeq: number,
+        memberSeq: string,
         options?: DeleteMemberOption,
     ): Promise<DeleteMemberOutput> {
         try {

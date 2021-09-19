@@ -9,7 +9,7 @@ import { PracticesModule } from './practices/practices.module';
 import { AnalysesModule } from './analyses/analyses.module';
 import { RefVideosModule } from './ref-videos/ref-videos.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './common/common.module';
 import * as Joi from 'joi';
 import { Member } from './members/entities/members.entity';
@@ -37,9 +37,14 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
                 DB_USER: Joi.string().required(),
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
-                SECRET_KEY: Joi.string().required(),
+
                 SYSTEM_MBR_SEQ: Joi.number().required(),
+
+                SECRET_KEY: Joi.string().required(),
+
                 KAKAO_CLIENT_ID: Joi.string().required(),
+                KAKAO_LOGIN_HOST: Joi.string().required(),
+                KAKAO_GRANT_TYPE: Joi.string().required(),
                 BASE_DOMAIN: Joi.string().required(),
             }),
         }),
