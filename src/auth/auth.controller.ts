@@ -1,5 +1,15 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Query,
+    Req,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { GetTokenPostData } from './dtos/get-token.dto';
 
@@ -9,6 +19,16 @@ export class AuthController {
         private readonly authService: AuthService,
         private readonly configService: ConfigService,
     ) {}
+
+    @Get('me')
+    @UseGuards(AuthGuard)
+    getLoggedInMember(@Req() req: Request) {
+        if (req.hasOwnProperty('member')) {
+            return { ok: true, response: req['member'] };
+        } else {
+            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
+        }
+    }
 
     @Get('login')
     getLoginPage() {
