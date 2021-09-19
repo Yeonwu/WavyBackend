@@ -3,12 +3,11 @@ import {
     Controller,
     Delete,
     Get,
-    HttpException,
-    HttpStatus,
     Param,
     Post,
     Put,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import {
     CreateMemberInput,
@@ -24,6 +23,7 @@ import {
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { MbrStaticsSerivce } from './mbr-statics.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('members')
 export class MembersController {

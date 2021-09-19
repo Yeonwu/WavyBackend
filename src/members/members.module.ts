@@ -11,5 +11,6 @@ import { MembersService } from './members.service';
     imports: [TypeOrmModule.forFeature([Member]), ConfigModule],
     controllers: [MembersController],
     providers: [MembersService, MbrStaticsSerivce],
+    exports: [MembersService],
 })
 export class MembersModule {}
