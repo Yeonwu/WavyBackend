@@ -56,13 +56,14 @@ export class AuthController {
         return res.redirect(url);
     }
 
-    // @Get('kakaoLogout')
-    // getKakaoLogout() {
-    //     const _hostName = 'kauth.kakao.com';
-    //     const _restApiKey = this.configService.get('KAKAO_CLIENT_ID');
-    //     const url = `https://${_hostName}/v1/user/unlink`;
+    @Get('kakaoLogout')
+    getKakaoLogout(@Req() req: Request) {
+        const _hostName = 'kapi.kakao.com';
+        const accessToken = req['accessToken'];
+        const url = `https://${_hostName}/v1/user/unlink`;
 
-    // }
+        return this.authService.unlinkToken(url, accessToken);
+    }
 
     @Get('kakaoLoginRedirect')
     kakaoLoginRedirect(

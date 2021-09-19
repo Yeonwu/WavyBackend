@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from 'src/members/entities/members.entity';
 import { Repository } from 'typeorm';
-import { compile, options } from 'joi';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,6 @@ export class AuthService {
     ) {}
     async getToken(url: string, data: GetTokenPostData) {
         try {
-            console.log(data);
             const getAccessToken: any = await got
                 .post(url, {
                     headers: {
@@ -44,15 +42,13 @@ export class AuthService {
                     mbrKakaoSeq: getKakaoMbrSeq.id,
                 },
             });
-            console.log(member);
 
             const jwtToken = this.jwtServce.sign({
                 mbrSeq: member.mbrSeq,
                 accessToken,
             });
-            console.log(jwtToken);
 
-            return jwtToken;
+            return { ok: true, token: jwtToken };
         } catch (error) {
             console.log(error);
             return {
@@ -61,5 +57,25 @@ export class AuthService {
             };
         }
     }
-    async unlinkToken(url: string) {}
+    async unlinkToken(url: string, accessToken: string) {
+        try {
+            console.log(url);
+            console.log(accessToken);
+
+            const result: any = await got.post(url, {
+                headers: {
+                    'Content-type':
+                        'application/x-www-form-urlencoded;charset=utf-8',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            // return result.body;
+            console.log(result);
+
+            return { ok: true };
+        } catch (error) {
+            console.log(error.message);
+            return { ok: false, error: '로그아웃에 실패했습니다' };
+        }
+    }
 }
