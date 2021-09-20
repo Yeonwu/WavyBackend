@@ -15,22 +15,27 @@ export class JwtMiddleware implements NestMiddleware {
                 const token = req.headers['x-jwt'].toString();
                 const decoded = this.jwtService.verify(token);
 
-                if (
-                    typeof decoded === 'object' &&
-                    decoded.hasOwnProperty('mbrSeq')
-                ) {
-                    const member = await this.memberService.getMemberBySeq(
-                        decoded.mbrSeq,
-                    );
+                if (typeof decoded === 'object') {
+                    req.body.jwt = decoded;
+                    if (decoded.hasOwnProperty('mbrSeq')) {
+                        const { ok, member } =
+                            await this.memberService.getMemberBySeq(
+                                decoded.mbrSeq,
+                            );
 
-                    req.body.member = member;
-                    req.body.accessToken = decoded.accessToken;
+                        if (!ok) {
+                            throw new Error(
+                                `From JwtMiddleWare: Cannot find Member by mbrSeq(${decoded.mbrSeq}).`,
+                            );
+                        }
+                        req.body.member = member;
+                    }
                 }
             }
         } catch (error) {
-            console.log(error.message);
-            req.body.member = null;
-            req.body.accessToken = null;
+            console.log(`From JwtMiddleWare: ${error.message}`);
+            req.body.member = req.body.member ?? null;
+            req.body.jwt = req.body.jwt ?? null;
         } finally {
             next();
         }

@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { AuthGuard } from './auth.guard';
+import { AccessTokenGuard, MemberGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -33,13 +33,14 @@ export class AuthController {
     }
 
     @Get('kakaoLogout')
-    getKakaoLogout(@Req() req: Request) {
-        const accessToken = req.body.accessToken;
+    @UseGuards(AccessTokenGuard)
+    kakaoLogout(@Req() req: Request) {
+        const accessToken = req.body.jwt.accessToken;
         return this.authService.unlinkToken(accessToken);
     }
 
     @Get('me')
-    @UseGuards(AuthGuard)
+    @UseGuards(MemberGuard)
     getLoggedInMember(@Req() req: Request) {
         return this.authService.getLoggedInMember(req);
     }

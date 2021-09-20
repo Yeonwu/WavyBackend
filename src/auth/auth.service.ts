@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import got from 'got';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -15,6 +15,7 @@ import * as camelcaseKeys from 'camelcase-keys';
 @Injectable()
 export class AuthService {
     constructor(
+        @Inject(forwardRef(() => MembersService))
         private readonly memberService: MembersService,
         private readonly jwtServce: JwtService,
         private readonly configService: ConfigService,
@@ -39,14 +40,10 @@ export class AuthService {
             const { ok, error, member } =
                 await this.memberService.getMemberByKakaoSeq(mbrKakaoSeq);
 
-            if (!ok) {
-                return { ok: false, error };
-            }
-
             const jwtToken = this.createJwt(
-                member.mbrSeq,
+                member?.mbrSeq,
                 kakaoTokens.accessToken,
-                kakaoTokens.expiresIn,
+                this.UnixEpochTimestamp() + kakaoTokens.expiresIn,
             );
 
             return { ok: true, token: jwtToken };
@@ -129,7 +126,7 @@ export class AuthService {
         }
     }
 
-    private async getMbrKakaoSeq(accessToken: string): Promise<string> {
+    async getMbrKakaoSeq(accessToken: string): Promise<string> {
         try {
             const response: any = await got
                 .get('https://kapi.kakao.com/v2/user/me', {
@@ -150,14 +147,10 @@ export class AuthService {
         return Math.floor(new Date().valueOf() / 1000);
     }
 
-    private createJwt(
-        mbrSeq: string,
-        accessToken: string,
-        expires: number,
-    ): string {
+    createJwt(mbrSeq: string, accessToken: string, exp: number): string {
         return this.jwtServce.sign({
-            exp: this.UnixEpochTimestamp() + expires,
             mbrSeq,
+            exp,
             accessToken,
         });
     }

@@ -1,6 +1,8 @@
 import { Member } from '../entities/members.entity';
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { IsJWT } from 'class-validator';
 
 export class CreateMemberInput extends PickType(Member, [
     'mbrEmail',
@@ -10,8 +12,13 @@ export class CreateMemberInput extends PickType(Member, [
     'privacyConsentCode',
     'marketingConsentCode',
     'videoOptionCode',
+    'mbrKakaoSeq',
 ]) {}
+
 export class CreateMemberOutput extends CoreOutput {
     @ApiProperty()
     member?: Member;
+
+    @IsJWT()
+    token?: string;
 }

@@ -18,11 +18,18 @@ import {
 } from 'src/common/enums/code.enum';
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
 import { MemberExpHistory } from './mbr-exp-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
+@Unique(['mbrKakaoSeq'])
 export class Member extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'mbr_seq', type: 'bigint' })
     @IsNumberString()

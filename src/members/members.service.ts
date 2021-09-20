@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { MemberCertificationMethodCode } from 'src/common/enums/code.enum';
 import { Repository } from 'typeorm';
 import {
     CreateMemberInput,
@@ -22,24 +26,16 @@ export class MembersService {
     constructor(
         @InjectRepository(Member)
         private readonly members: Repository<Member>,
+
         private readonly configService: ConfigService,
+
+        @Inject(forwardRef(() => AuthService))
+        private readonly authService: AuthService,
     ) {}
 
     private buildMember(newMemberInput: CreateMemberInput): Member {
-        const newMember = this.members.create();
+        const newMember = this.members.create(newMemberInput);
         const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
-
-        newMember.mbrEmail = newMemberInput.mbrEmail;
-        newMember.mbrNickname = newMemberInput.mbrNickname;
-        newMember.profileImageUrl = newMemberInput?.profileImageUrl;
-
-        newMember.certificationMethodCode =
-            newMemberInput.certificationMethodCode;
-
-        newMember.privacyConsentCode = newMemberInput.privacyConsentCode;
-        newMember.marketingConsentCode = newMemberInput.certificationMethodCode;
-
-        newMember.videoOptionCode = newMemberInput.videoOptionCode;
 
         newMember.creatorSeq = systemMbrSeq;
         newMember.updaterSeq = systemMbrSeq;
@@ -53,11 +49,28 @@ export class MembersService {
 
     async createMember(
         newMemberInput: CreateMemberInput,
+        jwt: AuthJwtDecoded,
     ): Promise<CreateMemberOutput> {
         try {
+            switch (newMemberInput.certificationMethodCode) {
+                case MemberCertificationMethodCode.KAKAO:
+                    newMemberInput.mbrKakaoSeq =
+                        await this.authService.getMbrKakaoSeq(jwt.accessToken);
+                    break;
+                default:
+                    return { ok: false, error: '회원가입에 실패했습니다.' };
+            }
+
             const newMember = this.buildMember(newMemberInput);
             await this.saveMember(newMember);
-            return { ok: true, member: newMember };
+
+            const newToken = this.authService.createJwt(
+                newMember.mbrSeq,
+                jwt.accessToken,
+                jwt.exp,
+            );
+
+            return { ok: true, member: newMember, token: newToken };
         } catch (error) {
             console.log(error.message);
             return { ok: false, error: '회원가입에 실패했습니다.' };
@@ -83,7 +96,7 @@ export class MembersService {
 
             return { ok: true, member };
         } catch (error) {
-            console.log(error.message);
+            console.log(`From getMemberBySeq: ${error.message}`);
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         }
     }

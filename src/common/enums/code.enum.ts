@@ -1,5 +1,5 @@
 export enum MemberCertificationMethodCode {
-    'test',
+    KAKAO = 'KAKAO',
 }
 export enum MemberMarketingConsentCode {
     'test',

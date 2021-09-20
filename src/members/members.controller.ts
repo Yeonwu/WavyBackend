@@ -7,6 +7,8 @@ import {
     Post,
     Put,
     Query,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
 import {
     CreateMemberInput,
@@ -22,6 +24,9 @@ import {
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { MbrStaticsSerivce } from './mbr-statics.service';
+import { AccessTokenGuard } from 'src/auth/auth.guard';
+import { Request } from 'express';
+import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
 
 @Controller('members')
 export class MembersController {
@@ -30,14 +35,16 @@ export class MembersController {
         private readonly mbrStaticsService: MbrStaticsSerivce,
     ) {}
     @Post('signup')
+    @UseGuards(AccessTokenGuard)
     @ApiCreatedResponse({
         description: '회원가입 API',
         type: CreateMemberOutput,
     })
     async createMember(
-        @Body() createMemberInput: CreateMemberInput,
+        @Body('member') createMemberInput: CreateMemberInput,
+        @Body('jwt') jwt: AuthJwtDecoded,
     ): Promise<CreateMemberOutput> {
-        return await this.membersSerivce.createMember(createMemberInput);
+        return await this.membersSerivce.createMember(createMemberInput, jwt);
     }
 
     @Get(':id')
