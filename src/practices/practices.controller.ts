@@ -3,6 +3,7 @@ import {
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiSecurity,
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthMember } from 'src/auth/auth-member.decorator';
@@ -16,6 +17,7 @@ import { PracticesTodaySumOutput } from './dtos/practices-today-sum.dto';
 import { PracticesService } from './practices.service';
 
 @ApiTags('연습')
+@ApiSecurity('Authorization')
 @Controller('practices')
 export class PracticesController {
     constructor(private readonly practicesService: PracticesService) {}
