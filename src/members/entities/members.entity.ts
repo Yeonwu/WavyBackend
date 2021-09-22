@@ -18,15 +18,19 @@ import {
 } from 'src/common/enums/code.enum';
 import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
+
+import { MemberExpHistory } from './mbr-exp-history.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
     Column,
     Entity,
+    JoinTable,
+    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     Unique,
 } from 'typeorm';
-import { MemberExpHistory } from './mbr-exp-history.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 @Unique(['mbrKakaoSeq'])
