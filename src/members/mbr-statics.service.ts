@@ -71,7 +71,7 @@ export class MbrStaticsSerivce {
         const getDancesGoodAtSQL = `
         SELECT 
             rv.rv_song_name AS name, 
-            ROUND(AVG(an.an_score)) AS average_score
+            MAX(an.an_score) AS average_score
         FROM analysis AS an
         JOIN ref_video AS rv
             ON an.rv_seq = rv.rv_seq
