@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import { Brackets, Repository } from 'typeorm';
+import { SearchAnalysesOrderBy } from './analyses.controller';
 import { CreateAnalysisResultInput } from './dtos/create-analysis-result.dto';
 import { Analysis } from './entities/analyses.entity';
 
@@ -21,7 +23,7 @@ export class AnalysesService {
         private readonly configService: ConfigService,
     ) {}
 
-    async getAnalyses(mbrSeq: string) {
+    async getAnalyses(mbrSeq: string, page: string) {
         try {
             const analyses = await this.analyses
                 .createQueryBuilder('an')
@@ -43,6 +45,8 @@ export class AnalysesService {
                 ])
                 .where('an.mbr_seq = :id', { id: mbrSeq })
                 .andWhere('an.an_deleted = false')
+                .limit(PaginationInput.take)
+                .offset(PaginationInput.skip(+page))
                 .getMany();
             return { ok: true, analyses: analyses };
         } catch (error) {
@@ -71,11 +75,18 @@ export class AnalysesService {
         }
     }
 
-    async searchAnalyses(mbrSeq: string, query: string, orderBy: string) {
+    async searchAnalyses(
+        mbrSeq: string,
+        query: string,
+        orderBy: string,
+        page: string,
+    ) {
         try {
-            const { orderByColumn, orderByType } = this.parseOrderBy(orderBy);
+            page = page ?? '1';
             query = query ?? '';
             orderBy = orderBy ?? '';
+
+            const { orderByColumn, orderByType } = this.parseOrderBy(orderBy);
 
             const analysis = await this.analyses
                 .createQueryBuilder('an')
@@ -114,6 +125,8 @@ export class AnalysesService {
                     }),
                 )
                 .orderBy(orderByColumn, orderByType)
+                .limit(PaginationInput.take)
+                .offset(PaginationInput.skip(+page))
                 .getMany();
             return { ok: true, analyses: analysis };
         } catch (error) {
@@ -160,9 +173,11 @@ export class AnalysesService {
                 mbrSeq,
                 anSeq,
             );
+
             if (!ok) {
                 return { ok, error };
             }
+
             const analysis = response.analysis;
             analysis.anDeleted = true;
 
@@ -175,7 +190,21 @@ export class AnalysesService {
         }
     }
 
-    private delete;
+    async purgeAnalysis(mbrSeq: string, anSeq: string) {
+        try {
+            const { ok, error } = await this.getAnalysisBySeq(mbrSeq, anSeq);
+            if (!ok) {
+                return { ok, error };
+            }
+
+            await this.analyses.delete({ anSeq });
+
+            return { ok: true };
+        } catch (error) {
+            console.log(error.message);
+            return { ok: false, error: '분석 결과를 삭제하지 못했습니다.' };
+        }
+    }
 
     async createAnalysisResult(
         mbrSeq: string,
@@ -201,6 +230,11 @@ export class AnalysesService {
     }
 
     async createAnalysisRequest(req: Request) {
+        /***
+         * TODO
+         * - 영상 s3에 업로드(스트리밍?)
+         * - 인공지능 돌리는 EC2에 분석 요청
+         */
         return { ok: true };
     }
 

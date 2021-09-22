@@ -13,8 +13,10 @@ import { Request } from 'express';
 import { AuthJwt } from 'src/auth/auth-jwt.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { AnalysesService } from './analyses.service';
 import { CreateAnalysisResultInput } from './dtos/create-analysis-result.dto';
+import { SearchAnalysisQuery } from './dtos/search-analyses.dto';
 
 export type SearchAnalysesOrderBy =
     | 'latest'
@@ -28,18 +30,27 @@ export class AnalysesController {
 
     @Get()
     @UseGuards(MemberGuard)
-    getAnalyses(@AuthJwt() jwt: AuthJwtDecoded) {
-        return this.analysesService.getAnalyses(jwt.mbrSeq);
+    getAnalyses(
+        @AuthJwt() jwt: AuthJwtDecoded,
+        @Query() paginationInput: PaginationInput,
+    ) {
+        const { page } = paginationInput;
+        return this.analysesService.getAnalyses(jwt.mbrSeq, page);
     }
 
     @Get('search')
     @UseGuards(MemberGuard)
     searchAnalyses(
         @AuthJwt() jwt: AuthJwtDecoded,
-        @Query('q') query: string,
-        @Query('orderby') orderBy: SearchAnalysesOrderBy,
+        @Query() query: SearchAnalysisQuery,
     ) {
-        return this.analysesService.searchAnalyses(jwt.mbrSeq, query, orderBy);
+        const { page, q, orderby } = query;
+        return this.analysesService.searchAnalyses(
+            jwt.mbrSeq,
+            q,
+            orderby,
+            page,
+        );
     }
 
     @Get(':id')
