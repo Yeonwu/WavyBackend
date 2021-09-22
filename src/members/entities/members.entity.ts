@@ -16,7 +16,6 @@ import {
     MemberVideoOptionCode,
     MemberCertificationMethodCode,
 } from 'src/common/enums/code.enum';
-import { MemberRefVideo } from 'src/members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from 'src/practices/entities/practice.entity';
 import {
     Column,
@@ -25,8 +24,18 @@ import {
     PrimaryGeneratedColumn,
     Unique,
 } from 'typeorm';
+
 import { MemberExpHistory } from './mbr-exp-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 @Unique(['mbrKakaoSeq'])
@@ -97,12 +106,6 @@ export class Member extends CoreEntity {
     practices: Practice[];
 
     @OneToMany(
-        (type) => MemberRefVideo,
-        (memberRefVideo) => memberRefVideo.member,
-    )
-    memberRefVideoes: MemberRefVideo[];
-
-    @OneToMany(
         (type) => MemberExpHistory,
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
@@ -110,4 +113,18 @@ export class Member extends CoreEntity {
 
     @Column({ name: 'mbr_deleted', type: 'boolean', default: false })
     mbrDeleted: boolean;
+
+    @ManyToMany((type) => RefVideo)
+    @JoinTable({
+        name: 'bookmarks',
+        joinColumn: {
+            name: 'mbr_seq',
+            referencedColumnName: 'mbrSeq',
+        },
+        inverseJoinColumn: {
+            name: 'rv_seq',
+            referencedColumnName: 'rvSeq',
+        },
+    })
+    bookmarkedRefVideos: RefVideo[];
 }
