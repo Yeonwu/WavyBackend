@@ -1,12 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Put,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RefVideoOutput } from './dtos/ref-video.dto';
 import { RefVideosInput, RefVideosOutput } from './dtos/ref-videos.dto';
@@ -30,7 +22,7 @@ export class RefVideosController {
     })
     @Get()
     getRefVideos(
-        @Body() refVideosInput: RefVideosInput,
+        @Query() refVideosInput: RefVideosInput,
     ): Promise<RefVideosOutput> {
         return this.refVideosService.allRefVideos(refVideosInput);
     }
@@ -45,7 +37,7 @@ export class RefVideosController {
     })
     @Get('search')
     searchRefVideos(
-        @Body() searchRefVideosInput: SearchRefVideosInput,
+        @Query() searchRefVideosInput: SearchRefVideosInput,
     ): Promise<SearchRefVideosOutput> {
         return this.refVideosService.searchRefVideos(searchRefVideosInput);
     }
@@ -62,13 +54,4 @@ export class RefVideosController {
     getRefVideo(@Param('id') refVideoId: string): Promise<RefVideoOutput> {
         return this.refVideosService.findRefVideoById(refVideoId);
     }
-
-    // @Post()
-    // postOne() {}
-
-    // @Put(':id')
-    // putOne(@Param('id') id: string) {}
-
-    // @Delete(':id')
-    // deleteOne(@Param('id') id: string) {}
 }
