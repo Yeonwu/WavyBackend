@@ -2,12 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import { Brackets, Repository } from 'typeorm';
-import { SearchAnalysesOrderBy } from './analyses.controller';
-import { CreateAnalysisResultInput } from './dtos/create-analysis-result.dto';
+import {
+    CreateAnalysisResultInput,
+    CreateAnalysisResultOutput,
+} from './dtos/create-analysis-result.dto';
+import {
+    GetAnalysesOutput,
+    GetAnalysisBySeqOutput,
+} from './dtos/get-analyses.dto';
 import { Analysis } from './entities/analyses.entity';
 
 interface ParceOrderByOutput {
@@ -23,7 +30,10 @@ export class AnalysesService {
         private readonly configService: ConfigService,
     ) {}
 
-    async getAnalyses(mbrSeq: string, page: string) {
+    async getAnalyses(
+        mbrSeq: string,
+        page: string,
+    ): Promise<GetAnalysesOutput> {
         try {
             const analyses = await this.analyses
                 .createQueryBuilder('an')
@@ -80,7 +90,7 @@ export class AnalysesService {
         query: string,
         orderBy: string,
         page: string,
-    ) {
+    ): Promise<GetAnalysesOutput> {
         try {
             page = page ?? '1';
             query = query ?? '';
@@ -142,7 +152,10 @@ export class AnalysesService {
         }
     }
 
-    async getAnalysisBySeq(mbrSeq: string, anSeq: string) {
+    async getAnalysisBySeq(
+        mbrSeq: string,
+        anSeq: string,
+    ): Promise<GetAnalysisBySeqOutput> {
         try {
             const analysis = await this.analyses
                 .createQueryBuilder('an')
@@ -152,7 +165,7 @@ export class AnalysesService {
                 .andWhere('an.an_deleted = false')
                 .getOne();
 
-            return { ok: true, response: { analysis } };
+            return { ok: true, analysis: analysis };
         } catch (error) {
             console.log(
                 `From AnalysesService.getAnalysisBySeq: ${error.message}`,
@@ -167,9 +180,9 @@ export class AnalysesService {
         }
     }
 
-    async deleteAnalysis(mbrSeq: string, anSeq: string) {
+    async deleteAnalysis(mbrSeq: string, anSeq: string): Promise<CoreOutput> {
         try {
-            const { ok, response, error } = await this.getAnalysisBySeq(
+            const { ok, analysis, error } = await this.getAnalysisBySeq(
                 mbrSeq,
                 anSeq,
             );
@@ -177,8 +190,6 @@ export class AnalysesService {
             if (!ok) {
                 return { ok, error };
             }
-
-            const analysis = response.analysis;
             analysis.anDeleted = true;
 
             await this.analyses.save(analysis);
@@ -190,7 +201,7 @@ export class AnalysesService {
         }
     }
 
-    async purgeAnalysis(mbrSeq: string, anSeq: string) {
+    async purgeAnalysis(mbrSeq: string, anSeq: string): Promise<CoreOutput> {
         try {
             const { ok, error } = await this.getAnalysisBySeq(mbrSeq, anSeq);
             if (!ok) {
@@ -209,12 +220,12 @@ export class AnalysesService {
     async createAnalysisResult(
         mbrSeq: string,
         analysisInput: CreateAnalysisResultInput,
-    ) {
+    ): Promise<CreateAnalysisResultOutput> {
         try {
             const newAnalysis = await this.buildAnalysis(analysisInput, mbrSeq);
             const savedAnalysis = await this.analyses.save(newAnalysis);
 
-            return { ok: true, response: { analysis: savedAnalysis } };
+            return { ok: true, analysis: savedAnalysis };
         } catch (error) {
             console.log(
                 `Args: (${mbrSeq}, ${analysisInput}), (mbrSeq: ${typeof mbrSeq}, analysis: ${typeof analysisInput})`,
