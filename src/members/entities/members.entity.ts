@@ -1,7 +1,9 @@
 import {
     IsEmail,
     IsEnum,
+    IsNumber,
     IsNumberString,
+    IsOptional,
     IsString,
     IsUrl,
 } from 'class-validator';
@@ -12,8 +14,17 @@ import {
     MemberMarketingConsentCode,
     MemberPrivacyConsentCode,
     MemberVideoOptionCode,
+    MemberCertificationMethodCode,
 } from 'src/common/enums/code.enum';
 import { Practice } from 'src/practices/entities/practice.entity';
+import {
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
+
 import { MemberExpHistory } from './mbr-exp-history.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
@@ -27,6 +38,7 @@ import {
 } from 'typeorm';
 
 @Entity()
+@Unique(['mbrKakaoSeq'])
 export class Member extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'mbr_seq', type: 'bigint' })
     @IsNumberString()
@@ -37,6 +49,11 @@ export class Member extends CoreEntity {
     @ApiProperty()
     @IsEmail()
     mbrEmail: string;
+
+    @Column({ name: 'mbr_kakao_seq', type: 'bigint', nullable: true })
+    @IsOptional()
+    @IsNumber()
+    mbrKakaoSeq: string;
 
     @Column({ name: 'mbr_nickname', type: 'varchar', length: 255 })
     @ApiProperty()
@@ -49,7 +66,7 @@ export class Member extends CoreEntity {
         length: 50,
     })
     @ApiProperty()
-    @IsEnum(MemberRefVideoIsBookmarkedCode)
+    @IsEnum(MemberCertificationMethodCode)
     certificationMethodCode: string;
 
     @Column({
@@ -93,6 +110,9 @@ export class Member extends CoreEntity {
         (memberExpHistory: MemberExpHistory) => memberExpHistory.member,
     )
     memberExpHistories: MemberExpHistory[];
+
+    @Column({ name: 'mbr_deleted', type: 'boolean', default: false })
+    mbrDeleted: boolean;
 
     @ManyToMany((type) => RefVideo)
     @JoinTable({

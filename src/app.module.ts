@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+    MiddlewareConsumer,
+    Module,
+    NestModule,
+    RequestMethod,
+} from '@nestjs/common';
 import { MembersModule } from './members/members.module';
 import { PracticesModule } from './practices/practices.module';
 import { AnalysesModule } from './analyses/analyses.module';
@@ -15,6 +20,8 @@ import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { TagsModule } from './tags/tags.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
@@ -31,7 +38,15 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
                 DB_USER: Joi.string().required(),
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
-                PRIVATE_KEY: Joi.string().required(),
+
+                SYSTEM_MBR_SEQ: Joi.number().required(),
+
+                SECRET_KEY: Joi.string().required(),
+
+                KAKAO_CLIENT_ID: Joi.string().required(),
+                KAKAO_LOGIN_HOST: Joi.string().required(),
+                KAKAO_GRANT_TYPE: Joi.string().required(),
+                BASE_DOMAIN: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({
@@ -60,9 +75,17 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
         RefVideosModule,
         CommonModule,
         TagsModule,
+        AuthModule,
         BookmarksModule,
     ],
     controllers: [],
     providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(JwtMiddleware).forRoutes({
+            path: '*',
+            method: RequestMethod.ALL,
+        });
+    }
+}
