@@ -1,8 +1,7 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Practice } from '../entities/practice.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
-import { PracticeVideoTypeCode } from 'src/common/enums/code.enum';
+import { IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreatePracticeInput {
     @ApiProperty({ type: String, description: '연습 시작시간' })
@@ -14,11 +13,11 @@ export class CreatePracticeInput {
     ptFinished: string;
 
     @ApiProperty({
-        enum: PracticeVideoTypeCode,
+        type: Number,
         description: '연습에 사용된 영상의 타입(학습용 영상 또는 유튜브 영상)',
     })
-    @IsEnum(PracticeVideoTypeCode)
-    ptVideoTypeCode: string;
+    @IsNumber()
+    ptVideoTypeCode: number;
 
     @ApiPropertyOptional({
         type: String,
