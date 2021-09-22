@@ -8,4 +8,5 @@ export class CreateAnalysisResultInput extends OmitType(Analysis, [
     'updaterSeq',
     'mbrSeq',
     'anSeq',
+    'anDeleted',
 ]) {}

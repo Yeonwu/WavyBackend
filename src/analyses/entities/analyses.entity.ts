@@ -1,4 +1,5 @@
 import {
+    IsBoolean,
     IsEnum,
     IsNumber,
     IsNumberString,
@@ -67,4 +68,8 @@ export class Analysis extends CoreEntity {
     @Column({ name: 'an_simularity_url', type: 'varchar', length: 255 })
     @IsUrl()
     anSimularityURL: string;
+
+    @Column({ name: 'an_deleted', type: 'boolean', default: false })
+    @IsBoolean()
+    anDeleted: boolean;
 }
