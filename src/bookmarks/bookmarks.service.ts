@@ -4,7 +4,7 @@ import * as camelcaseKeys from 'camelcase-keys';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BookmarksInput, BookmarksOutput } from './dtos/bookmarks.dto';
 import {
     CreateBookmarkInput,
@@ -32,7 +32,7 @@ export class BookmarksService {
             const sql = `
                 SELECT * FROM ref_video
                 JOIN (SELECT rv_seq FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1}) AS RVSEQ
+                WHERE mbr_seq = ${authMember.mbrSeq}) AS RVSEQ
                 ON RVSEQ.rv_seq = ref_video.rv_seq
                 LIMIT ${PaginationInput.take}
                 OFFSET ${PaginationInput.skip(+page)}
@@ -40,7 +40,7 @@ export class BookmarksService {
             const sql2 = `
                 SELECT COUNT(ref_video.rv_seq) AS totalresults FROM ref_video
                 JOIN (SELECT rv_seq FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1}) AS RVSEQ
+                WHERE mbr_seq = ${authMember.mbrSeq}) AS RVSEQ
                 ON RVSEQ.rv_seq = ref_video.rv_seq
             `;
             let sqlRawResults;
@@ -86,16 +86,6 @@ export class BookmarksService {
                     error: '존재하지 않는 학습용 동영상입니다',
                 };
             }
-            // 임시 authMember
-            const tempMember = getRepository(Member).create();
-            tempMember.mbrEmail = 'example@gmail.com';
-            tempMember.mbrNickname = 'example';
-            tempMember.certificationMethodCode = 'NAVER';
-            tempMember.privacyConsentCode = 'Y';
-            tempMember.marketingConsentCode = 'Y';
-            tempMember.videoOptionCode = 'MEDIUM';
-            tempMember.creatorSeq = '1';
-            tempMember.updaterSeq = '1';
 
             const sql = `
                 SELECT COUNT(*) FROM bookmarks
@@ -109,11 +99,8 @@ export class BookmarksService {
                     error: '이미 보관된 영상입니다',
                 };
             }
-
-            tempMember.bookmarkedRefVideos = [refVideo];
-            // authMember.bookmarkedRefVideos = [refVideo];
-            // await this.members.manager.save(authMember);
-            await this.members.manager.save(tempMember);
+            authMember.bookmarkedRefVideos = [refVideo];
+            await this.members.manager.save(authMember);
             return {
                 ok: true,
                 bookmarkedRefVideo: refVideo,
@@ -140,7 +127,7 @@ export class BookmarksService {
             }
             const sql = `
                 DELETE FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1} 
+                WHERE mbr_seq = ${authMember.mbrSeq} 
                 AND rv_seq = ${refVideoId}
             `;
             const sqlRawResults = await this.members.query(sql);

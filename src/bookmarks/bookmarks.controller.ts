@@ -1,10 +1,21 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Post,
+    Query,
+    UseGuards,
+} from '@nestjs/common';
 import {
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger';
+import { AuthMember } from 'src/auth/auth-member.decorator';
+import { MemberGuard } from 'src/auth/auth.guard';
+import { Member } from 'src/members/entities/members.entity';
 import { BookmarksService } from './bookmarks.service';
 import { BookmarksInput, BookmarksOutput } from './dtos/bookmarks.dto';
 import {
@@ -29,11 +40,11 @@ export class BookmarksController {
         type: BookmarksOutput,
     })
     @Get()
+    @UseGuards(MemberGuard)
     getBookmarks(
-        @Body() bookmarksInput: BookmarksInput,
+        @AuthMember() authMember: Member,
+        @Query() bookmarksInput: BookmarksInput,
     ): Promise<BookmarksOutput> {
-        // TODO: authMember를 인자로 받아야함
-        const authMember = null;
         return this.bookmarksService.allBookmarks(authMember, bookmarksInput);
     }
 
@@ -46,11 +57,11 @@ export class BookmarksController {
         type: CreateBookmarkOutput,
     })
     @Post()
+    @UseGuards(MemberGuard)
     postBookmark(
+        @AuthMember() authMember: Member,
         @Body() createBookmarkInput: CreateBookmarkInput,
     ): Promise<CreateBookmarkOutput> {
-        // TODO: authMember를 인자로 받아야함
-        const authMember = null;
         return this.bookmarksService.createBookmark(
             authMember,
             createBookmarkInput,
@@ -66,11 +77,11 @@ export class BookmarksController {
         type: DeleteBookmarkOutput,
     })
     @Delete()
+    @UseGuards(MemberGuard)
     deleteBookmark(
+        @AuthMember() authMember: Member,
         @Body() deleteBookmarkInput: DeleteBookmarkInput,
     ): Promise<DeleteBookmarkOutput> {
-        // TODO: authMember를 인자로 받아야함
-        const authMember = null;
         return this.bookmarksService.deleteBookmark(
             authMember,
             deleteBookmarkInput,
