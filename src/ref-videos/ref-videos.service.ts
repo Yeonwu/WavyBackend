@@ -24,7 +24,7 @@ export class RefVideosService {
     }: RefVideosInput): Promise<RefVideosOutput> {
         try {
             if (!page) {
-                page = 1;
+                page = '1';
             }
             if (!tagName) {
                 tagName = '';
@@ -39,7 +39,7 @@ export class RefVideosService {
                 ON RVS.rv_seq = ref_video.rv_seq
                 ORDER BY ref_video.created_date DESC
                 LIMIT ${PaginationInput.take}
-                OFFSET ${PaginationInput.skip(page)}
+                OFFSET ${PaginationInput.skip(+page)}
                 `;
             const sql2 = `
                 SELECT COUNT(DISTINCT ref_video.rv_seq) AS totalResults FROM ref_video
@@ -103,7 +103,7 @@ export class RefVideosService {
     }: SearchRefVideosInput): Promise<SearchRefVideosOutput> {
         try {
             if (!page) {
-                page = 1;
+                page = '1';
             }
             const [refVideos, totalResults] = await this.refVideos.findAndCount(
                 {
@@ -132,7 +132,7 @@ export class RefVideosService {
                         },
                     ],
                     take: PaginationInput.take,
-                    skip: PaginationInput.skip(page),
+                    skip: PaginationInput.skip(+page),
                 },
             );
             if (!refVideos) {

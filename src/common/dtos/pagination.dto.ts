@@ -1,9 +1,9 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { CoreOutput } from './output.dto';
 
 export class PaginationInput {
-    @IsNumber()
-    page: number;
+    @IsString()
+    page: string;
 
     static take = 9;
     static skip: (page: number) => number = (page) =>
