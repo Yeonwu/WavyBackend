@@ -76,10 +76,10 @@ export class BookmarksService {
 
     async createBookmark(
         authMember: Member,
-        { refVideoId }: CreateBookmarkInput,
+        { rvSeq }: CreateBookmarkInput,
     ): Promise<CreateBookmarkOutput> {
         try {
-            const refVideo = await this.refVideos.findOne(refVideoId);
+            const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
                     ok: false,
@@ -89,7 +89,7 @@ export class BookmarksService {
 
             const sql = `
                 SELECT COUNT(*) FROM bookmarks
-                WHERE mbr_seq = ${199} AND rv_seq = ${refVideoId}
+                WHERE mbr_seq = ${authMember.mbrSeq} AND rv_seq = ${rvSeq}
             `;
             const sqlRawResults = await this.members.query(sql);
             const { count } = sqlRawResults[0];
@@ -115,10 +115,10 @@ export class BookmarksService {
 
     async deleteBookmark(
         authMember: Member,
-        { refVideoId }: DeleteBookmarkInput,
+        { rvSeq }: DeleteBookmarkInput,
     ): Promise<DeleteBookmarkOutput> {
         try {
-            const refVideo = await this.refVideos.findOne(refVideoId);
+            const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
                     ok: false,
@@ -128,7 +128,7 @@ export class BookmarksService {
             const sql = `
                 DELETE FROM bookmarks
                 WHERE mbr_seq = ${authMember.mbrSeq} 
-                AND rv_seq = ${refVideoId}
+                AND rv_seq = ${rvSeq}
             `;
             const sqlRawResults = await this.members.query(sql);
             const count = sqlRawResults[1];
