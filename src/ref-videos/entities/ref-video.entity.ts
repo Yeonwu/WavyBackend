@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsEnum,
+    IsNumber,
     IsNumberString,
     IsOptional,
     IsString,
@@ -31,11 +32,11 @@ export class RefVideo extends CoreEntity {
     rvSeq: string;
 
     @ApiProperty({
-        enum: RefVideoSourceCode,
+        type: Number,
         description: '학습용 동영상 출처',
     })
-    @Column({ name: 'rv_source', type: 'varchar', length: 50 })
-    @IsEnum(RefVideoSourceCode)
+    @Column({ name: 'rv_source', type: 'int' })
+    @IsNumber()
     rvSource: string;
 
     @ApiProperty({
@@ -66,11 +67,11 @@ export class RefVideo extends CoreEntity {
     rvDuration: string;
 
     @ApiProperty({
-        enum: RefVideoDifficultyCode,
+        type: Number,
         description: '학습용 동영상 난이도',
     })
-    @Column({ name: 'rv_difficulty', type: 'varchar', length: 50 })
-    @IsEnum(RefVideoDifficultyCode)
+    @Column({ name: 'rv_difficulty', type: 'int' })
+    @IsNumber()
     rvDifficulty: string;
 
     @ApiPropertyOptional({ type: String, description: '학습용 동영상 곡명' })
