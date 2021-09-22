@@ -29,6 +29,7 @@ export class Analysis extends CoreEntity {
     member: Member;
 
     @RelationId((analysis: Analysis) => analysis.member)
+    @IsNumberString()
     mbrSeq: string;
 
     @ManyToOne((type) => RefVideo, (refVideo) => refVideo.analyses)
@@ -36,7 +37,8 @@ export class Analysis extends CoreEntity {
     refVideo: RefVideo;
 
     @RelationId((analysis: Analysis) => analysis.refVideo)
-    refSeq: string;
+    @IsNumberString()
+    rvSeq: string;
 
     @Column({ name: 'an_score', type: 'int' })
     @IsNumber()
