@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CoreOutput {
-    @ApiPropertyOptional({ type: Number, description: '오류 메세지' })
+    @ApiPropertyOptional({ type: String, description: '오류 메세지' })
     @IsString()
     @IsOptional()
     error?: string;
