@@ -18,9 +18,15 @@ import { JwtMiddleware } from './auth-jwt.middleware';
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(JwtMiddleware).forRoutes({
-            path: '/auth/kakaoLogout',
-            method: RequestMethod.GET,
-        });
+        consumer.apply(JwtMiddleware).forRoutes(
+            {
+                path: '/auth/kakaoLogout',
+                method: RequestMethod.GET,
+            },
+            {
+                path: '/auth/me',
+                method: RequestMethod.GET,
+            },
+        );
     }
 }
