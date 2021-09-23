@@ -4,6 +4,6 @@ import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 export const AuthJwt = createParamDecorator(
     (data: unknown, context: ExecutionContext): AuthJwtDecoded => {
         const req = context.switchToHttp().getRequest();
-        return req.body.jwt;
+        return JSON.parse(req.headers['x-jwt-decoded']);
     },
 );

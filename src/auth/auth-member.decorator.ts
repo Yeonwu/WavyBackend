@@ -4,6 +4,6 @@ import { Member } from 'src/members/entities/members.entity';
 export const AuthMember = createParamDecorator(
     (data: unknown, context: ExecutionContext): Member => {
         const req = context.switchToHttp().getRequest();
-        return req.body.member;
+        return JSON.parse(req.headers['x-member']);
     },
 );
