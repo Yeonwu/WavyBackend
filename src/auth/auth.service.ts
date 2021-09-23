@@ -1,13 +1,11 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import got from 'got';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { MembersService } from 'src/members/members.service';
 import {
     GetJwtOutput,
     GetKakaoTokenOutput,
-    getLoggedInMemberOutput,
     UnlinkTokenOutput,
 } from './dtos/get-token.dto';
 import * as camelcaseKeys from 'camelcase-keys';
@@ -74,18 +72,6 @@ export class AuthService {
         } catch (error) {
             console.log(error.message);
             return { ok: false, error: '로그아웃에 실패했습니다' };
-        }
-    }
-
-    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
-        try {
-            if (member.mbrSeq) {
-                return { ok: true, response: { member } };
-            }
-            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
-        } catch (error) {
-            console.log(error.message);
-            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         }
     }
 

@@ -10,13 +10,6 @@ export class GetJwtOutput extends CoreOutput {
 
 export class UnlinkTokenOutput extends CoreOutput {}
 
-export class getLoggedInMemberOutput extends CoreOutput {
-    @IsOptional()
-    response?: {
-        member: Member;
-    };
-}
-
 export class GetKakaoTokenOutput extends CoreOutput {
     @IsString()
     @IsOptional()

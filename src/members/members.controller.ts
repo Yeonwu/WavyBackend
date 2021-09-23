@@ -24,9 +24,12 @@ import {
 import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { MbrStaticsSerivce } from './mbr-statics.service';
-import { AccessTokenGuard } from 'src/auth/auth.guard';
+import { AccessTokenGuard, MemberGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { AuthJwt } from 'src/auth/auth-jwt.decorator';
+import { AuthMember } from 'src/auth/auth-member.decorator';
+import { Member } from './entities/members.entity';
 
 @Controller('members')
 export class MembersController {
@@ -42,12 +45,19 @@ export class MembersController {
     })
     async createMember(
         @Body('member') createMemberInput: CreateMemberInput,
-        @Body('jwt') jwt: AuthJwtDecoded,
+        @AuthJwt() jwt: AuthJwtDecoded,
     ): Promise<CreateMemberOutput> {
         return await this.membersSerivce.createMember(createMemberInput, jwt);
     }
 
+    @Get('me')
+    @UseGuards(MemberGuard)
+    getLoggedInMember(@AuthMember() member: Member) {
+        return this.membersSerivce.getLoggedInMember(member);
+    }
+
     @Get(':id')
+    @UseGuards(MemberGuard)
     @ApiResponse({
         status: 200,
         description: '회원정보 조회 API',

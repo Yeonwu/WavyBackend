@@ -61,7 +61,7 @@ export class Member extends CoreEntity {
     })
     @ApiProperty()
     @IsEnum(MemberCertificationMethodCode)
-    certificationMethodCode: string;
+    certificationMethodCode: number;
 
     @Column({
         name: 'mbr_profile_image_url',
@@ -76,12 +76,12 @@ export class Member extends CoreEntity {
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
     @ApiProperty()
     @IsEnum(MemberPrivacyConsentCode)
-    privacyConsentCode: string;
+    privacyConsentCode: number;
 
     @Column({ name: 'mbr_marketing_consent', type: 'varchar', length: 50 })
     @ApiProperty()
     @IsEnum(MemberMarketingConsentCode)
-    marketingConsentCode: string;
+    marketingConsentCode: number;
 
     @Column({
         name: 'mbr_video_option',
@@ -91,7 +91,7 @@ export class Member extends CoreEntity {
     })
     @ApiProperty()
     @IsEnum(MemberVideoOptionCode)
-    videoOptionCode: string;
+    videoOptionCode: number;
 
     @OneToMany((type) => Analysis, (analysis) => analysis.member)
     analyses: Analysis[];
