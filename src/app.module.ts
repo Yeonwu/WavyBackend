@@ -15,7 +15,6 @@ import * as Joi from 'joi';
 import { Member } from './members/entities/members.entity';
 import { Group, GroupDetail } from './common/entities/code.entity';
 import { Analysis } from './analyses/entities/analyses.entity';
-import { MemberRefVideo } from './members-ref-videoes/entities/members-ref-videoes.entity';
 import { Practice } from './practices/entities/practice.entity';
 import { MemberExpHistory } from './members/entities/mbr-exp-history.entity';
 import { RefVideo } from './ref-videos/entities/ref-video.entity';
@@ -23,6 +22,8 @@ import { Tag } from './tags/entities/tag.entity';
 import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/auth-jwt.middleware';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
+
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -59,7 +60,6 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
             logging: process.env.NODE_ENV !== 'prod',
             entities: [
                 Member,
-                MemberRefVideo,
                 MemberExpHistory,
                 Group,
                 GroupDetail,
@@ -76,9 +76,16 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
         CommonModule,
         TagsModule,
         AuthModule,
+        BookmarksModule,
     ],
     controllers: [],
     providers: [],
 })
-// export class AppModule {}
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(JwtMiddleware).forRoutes({
+            path: '*',
+            method: RequestMethod.ALL,
+        });
+    }
+}
