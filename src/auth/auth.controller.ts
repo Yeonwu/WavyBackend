@@ -1,8 +1,11 @@
-import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+import { Member } from 'src/members/entities/members.entity';
+import { AuthJwt } from './auth-jwt.decorator';
+import { AuthMember } from './auth-member.decorator';
 import { AccessTokenGuard, MemberGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 
 @Controller('auth')
 export class AuthController {
@@ -34,15 +37,15 @@ export class AuthController {
 
     @Get('kakaoLogout')
     @UseGuards(AccessTokenGuard)
-    kakaoLogout(@Req() req: Request) {
-        const accessToken = req.body.jwt.accessToken;
+    kakaoLogout(@AuthJwt() jwt: AuthJwtDecoded) {
+        const accessToken = jwt.accessToken;
         return this.authService.unlinkToken(accessToken);
     }
 
     @Get('me')
     @UseGuards(MemberGuard)
-    getLoggedInMember(@Req() req: Request) {
-        return this.authService.getLoggedInMember(req);
+    getLoggedInMember(@AuthMember() member: Member) {
+        return this.authService.getLoggedInMember(member);
     }
 
     @Get('test/login')
