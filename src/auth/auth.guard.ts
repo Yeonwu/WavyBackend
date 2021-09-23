@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import got from 'got';
 import { Member } from 'src/members/entities/members.entity';
 import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 
@@ -60,7 +59,8 @@ export class AccessTokenGuard extends CoreGuard {
 
 @Injectable()
 export class MemberGuard extends CoreGuard {
-    async vaildate(): Promise<boolean> {
-        return this.isAccessTokenValid() && this.isMemberValid();
+    vaildate(): Promise<boolean> {
+        const promise = this.isAccessTokenValid() && this.isMemberValid();
+        return promise;
     }
 }
