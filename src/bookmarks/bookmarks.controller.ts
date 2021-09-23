@@ -8,10 +8,10 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import {
+    ApiBearerAuth,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiSecurity,
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthMember } from 'src/auth/auth-member.decorator';
@@ -28,7 +28,7 @@ import {
     DeleteBookmarkOutput,
 } from './dtos/delete-bookmark.dto';
 @ApiTags('보관')
-@ApiSecurity('Authorization')
+@ApiBearerAuth('access-token')
 @Controller('bookmarks')
 export class BookmarksController {
     constructor(private readonly bookmarksService: BookmarksService) {}
