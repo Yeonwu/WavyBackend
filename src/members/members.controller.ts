@@ -67,30 +67,38 @@ export class MembersController {
         return await this.membersSerivce.getMemberBySeq(id);
     }
 
-    @Put(':id')
+    @Put()
+    @UseGuards(MemberGuard)
     @ApiResponse({
         status: 200,
         description: '회원정보 수정 API',
         type: UpdateMemberOutput,
     })
     async updateMember(
-        @Param('id') id: string,
+        @AuthMember() member: Member,
         @Body() updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
-        return await this.membersSerivce.updateMember(id, updateMemberInput);
+        return await this.membersSerivce.updateMember(
+            member.mbrSeq,
+            updateMemberInput,
+        );
     }
 
-    @Delete(':id')
+    @Delete()
     @ApiResponse({
         status: 200,
         description: '회원 탈퇴 API',
         type: DeleteMemberOutput,
     })
-    async deleteMember(@Param('id') id: string): Promise<DeleteMemberOutput> {
-        return await this.membersSerivce.deleteMember(id);
+    @UseGuards(MemberGuard)
+    async deleteMember(
+        @AuthMember() member: Member,
+    ): Promise<DeleteMemberOutput> {
+        return await this.membersSerivce.deleteMember(member.mbrSeq);
     }
 
     @Get(':id/statics')
+    @UseGuards(MemberGuard)
     @ApiResponse({
         status: 200,
         description: '회원 통계 조회 API',
@@ -98,10 +106,11 @@ export class MembersController {
     })
     async getStatics(
         @Param('id') id: string,
+        @AuthMember() member: Member,
         @Query('dancegoodlimit') dancesGoodAtLimit?: number,
         @Query('danceoftenlimit') dancesOftenLimit?: number,
     ): Promise<GetStaticsOuput> {
-        return await this.mbrStaticsService.getStatics(id, {
+        return await this.mbrStaticsService.getStatics(id, member.mbrSeq, {
             dancesGoodAtLimit: dancesGoodAtLimit || null,
             dancesOftenLimit: dancesOftenLimit || null,
         });

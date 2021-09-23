@@ -23,9 +23,13 @@ export class MbrStaticsSerivce {
 
     async getStatics(
         memberSeq: string,
+        tokenMbrSeq: string,
         options?: GetStaticsOptions,
     ): Promise<GetStaticsOuput> {
         try {
+            if (tokenMbrSeq !== memberSeq) {
+                return { ok: false, error: '회원 통계 조회에 실패했습니다.' };
+            }
             const getMemberResult = await this.memberService.getMemberBySeq(
                 memberSeq,
             );

@@ -142,13 +142,12 @@ export class MembersService {
         try {
             const getMemberResult = await this.getMemberBySeq(memberSeq);
             const member = getMemberResult?.member;
-            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
 
-            if (getMemberResult.ok) {
+            if (!getMemberResult.ok) {
                 return getMemberResult;
             }
 
-            member.updaterSeq = systemMbrSeq;
+            member.updaterSeq = member.mbrSeq;
 
             member.mbrNickname =
                 updateMemberInput.mbrNickname ?? member.mbrNickname;
