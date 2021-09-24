@@ -92,7 +92,6 @@ export class AnalysesService {
         page: string,
     ): Promise<GetAnalysesOutput> {
         try {
-            page = page ?? '1';
             query = query ?? '';
             orderBy = orderBy ?? '';
 
