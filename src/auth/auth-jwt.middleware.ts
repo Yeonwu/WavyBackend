@@ -11,12 +11,14 @@ export class JwtMiddleware implements NestMiddleware {
     ) {}
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            if ('x-jwt' in req.headers) {
-                const token = req.headers['x-jwt'].toString();
+            if ('authorization' in req.headers) {
+                const token = req.headers['authorization']
+                    .toString()
+                    .split(' ')[1];
                 const decoded = this.jwtService.verify(token);
 
                 if (typeof decoded === 'object') {
-                    req.body.jwt = decoded;
+                    req.headers['x-jwt-decoded'] = JSON.stringify(decoded);
                     if (decoded.hasOwnProperty('mbrSeq')) {
                         const { ok, member } =
                             await this.memberService.getMemberBySeq(
@@ -28,14 +30,14 @@ export class JwtMiddleware implements NestMiddleware {
                                 `From JwtMiddleWare: Cannot find Member by mbrSeq(${decoded.mbrSeq}).`,
                             );
                         }
-                        req.body.member = member;
+                        req.headers['x-member'] = JSON.stringify(member);
                     }
                 }
             }
         } catch (error) {
             console.log(`From JwtMiddleWare: ${error.message}`);
-            req.body.member = req.body.member ?? null;
-            req.body.jwt = req.body.jwt ?? null;
+            req.headers['x-jwt-decoded'] = req.headers['x-jwt-decoded'] ?? null;
+            req.headers['x-member'] = req.headers['x-member'] ?? null;
         } finally {
             next();
         }
