@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { CoreOutput } from 'src/common/dtos/output.dto';
@@ -59,8 +58,7 @@ export class AnalysesService {
                 .getMany();
             return { ok: true, analyses: analyses };
         } catch (error) {
-            console.log(`From AnalysesService.getAnalyses: ${error.message}`);
-            console.log(`Args: (${mbrSeq}), (mbrSeq: string)`);
+            console.log(error.stack, error.message);
 
             return {
                 ok: false,
@@ -138,10 +136,7 @@ export class AnalysesService {
                 .getMany();
             return { ok: true, analyses: analysis };
         } catch (error) {
-            console.log(`From AnalysesService.getAnalyses: ${error.message}`);
-            console.log(
-                `Args: (${mbrSeq}, ${query}, ${orderBy}), (mbrSeq: ${typeof mbrSeq}, query: ${typeof query}, orderBy: ${typeof orderBy})`,
-            );
+            console.log(error.stack, error.message);
 
             return {
                 ok: false,
@@ -165,12 +160,7 @@ export class AnalysesService {
 
             return { ok: true, analysis: analysis };
         } catch (error) {
-            console.log(
-                `From AnalysesService.getAnalysisBySeq: ${error.message}`,
-            );
-            console.log(
-                `Args: (${mbrSeq}, ${anSeq}), (mbrSeq: ${typeof mbrSeq}, anSeq: ${typeof anSeq})`,
-            );
+            console.log(error.stack, error.message);
             return {
                 ok: false,
                 error: '분석 결과를 불러오지 못했습니다.',
@@ -194,7 +184,7 @@ export class AnalysesService {
 
             return { ok: true };
         } catch (error) {
-            console.log(error.message);
+            console.log(error.stack, error.message);
             return { ok: false, error: '분석 결과를 삭제하지 못했습니다.' };
         }
     }
@@ -210,7 +200,7 @@ export class AnalysesService {
 
             return { ok: true };
         } catch (error) {
-            console.log(error.message);
+            console.log(error.stack, error.message);
             return { ok: false, error: '분석 결과를 삭제하지 못했습니다.' };
         }
     }
@@ -225,12 +215,7 @@ export class AnalysesService {
 
             return { ok: true, analysis: savedAnalysis };
         } catch (error) {
-            console.log(
-                `Args: (${mbrSeq}, ${analysisInput}), (mbrSeq: ${typeof mbrSeq}, analysis: ${typeof analysisInput})`,
-            );
-            console.log(
-                `From AnalysesService.createAnalysis: ${error.message}`,
-            );
+            console.log(error.stack, error.message);
             return {
                 ok: false,
                 error: '분석 결과를 등록하지 못했습니다.',
@@ -251,22 +236,17 @@ export class AnalysesService {
         analysis: CreateAnalysisResultInput,
         mbrSeq: string,
     ): Promise<Analysis> {
-        try {
-            const newAnalysis = this.analyses.create(analysis);
+        const newAnalysis = this.analyses.create(analysis);
 
-            newAnalysis.member = new Member();
-            newAnalysis.member.mbrSeq = mbrSeq;
+        newAnalysis.member = new Member();
+        newAnalysis.member.mbrSeq = mbrSeq;
 
-            newAnalysis.refVideo = new RefVideo();
-            newAnalysis.refVideo.rvSeq = analysis.rvSeq;
+        newAnalysis.refVideo = new RefVideo();
+        newAnalysis.refVideo.rvSeq = analysis.rvSeq;
 
-            newAnalysis.creatorSeq = mbrSeq;
-            newAnalysis.updaterSeq = mbrSeq;
+        newAnalysis.creatorSeq = mbrSeq;
+        newAnalysis.updaterSeq = mbrSeq;
 
-            return newAnalysis;
-        } catch (error) {
-            error.message = `\nFrom AnalysisService.buildAnalysis: ${error.message}`;
-            throw error;
-        }
+        return newAnalysis;
     }
 }
