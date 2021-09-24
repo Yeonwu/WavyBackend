@@ -28,6 +28,7 @@ export class MbrStaticsSerivce {
     ): Promise<GetStaticsOuput> {
         try {
             if (tokenMbrSeq !== memberSeq) {
+                console.log(tokenMbrSeq, memberSeq);
                 return { ok: false, error: '회원 통계 조회에 실패했습니다.' };
             }
             const getMemberResult = await this.memberService.getMemberBySeq(
@@ -122,13 +123,13 @@ export class MbrStaticsSerivce {
         const getDancesGoodAtSQL = `
         SELECT 
             rv.rv_song_name AS name, 
-            MAX(an.an_score) AS average_score
+            MAX(an.an_score) AS best_score
         FROM analysis AS an
         JOIN ref_video AS rv
             ON an.rv_seq = rv.rv_seq
         WHERE an.mbr_seq = ${memberSeq}
         GROUP BY rv.rv_seq
-        ORDER BY average_score DESC
+        ORDER BY best_score DESC
         LIMIT ${limit}
         `;
         const getDancesGoodAtQueryResult = await this.manager.query(
@@ -147,20 +148,28 @@ export class MbrStaticsSerivce {
         limit: number,
     ): Promise<DancesOften[]> {
         const getFavorateDancerSQL = `
-            SELECT rv.rv_song_name AS name, COUNT(rv.rv_song_name) AS times
+        SELECT rv.rv_song_name AS name, COUNT(rv.rv_song_name) AS times
+        FROM (
+            SELECT pt.rv_seq 
             FROM practice AS pt
-            JOIN ref_video AS rv
-                ON rv.rv_seq = pt.rv_seq
-            WHERE mbr_seq = ${memberSeq}
-            GROUP BY rv.rv_song_name
-            ORDER BY times DESC
-            LIMIT ${limit}
+            WHERE pt.mbr_seq = ${memberSeq}
+            UNION ALL
+            SELECT an.rv_seq
+            FROM analysis AS an
+            WHERE an.mbr_seq = ${memberSeq}
+        ) AS t
+        JOIN ref_video AS rv
+            ON rv.rv_seq = t.rv_seq
+        GROUP BY rv.rv_song_name
+        ORDER BY times DESC
+        LIMIT ${limit}
         `;
         const favorateDancerQueryResult = await this.manager.query(
             getFavorateDancerSQL,
         );
 
         const dancesOften: Array<DancesOften> = favorateDancerQueryResult;
+        dancesOften.map((item) => (item.times = +item.times));
         return dancesOften;
     }
 }
