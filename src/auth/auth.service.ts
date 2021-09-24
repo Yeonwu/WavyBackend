@@ -11,6 +11,7 @@ import {
     UnlinkTokenOutput,
 } from './dtos/get-token.dto';
 import * as camelcaseKeys from 'camelcase-keys';
+import { Member } from 'src/members/entities/members.entity';
 
 @Injectable()
 export class AuthService {
@@ -76,10 +77,10 @@ export class AuthService {
         }
     }
 
-    async getLoggedInMember(req: Request): Promise<getLoggedInMemberOutput> {
+    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
         try {
-            if (req.body.member) {
-                return { ok: true, response: req.body.member };
+            if (member.mbrSeq) {
+                return { ok: true, response: { member } };
             }
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         } catch (error) {

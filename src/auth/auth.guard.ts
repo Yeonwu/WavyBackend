@@ -1,39 +1,66 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Member } from 'src/members/entities/members.entity';
+import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 
-@Injectable()
-export class AccessTokenGuard implements CanActivate {
-    canActivate(context: ExecutionContext) {
+abstract class CoreGuard implements CanActivate {
+    private headers: Record<string, string>;
+
+    async isAccessTokenValid() {
         try {
-            const ACCESS_TOKEN_EXISTS = context.switchToHttp().getRequest().body
-                ?.jwt?.accessToken;
-
-            if (ACCESS_TOKEN_EXISTS) {
-                return true;
+            const rawJwt = this.headers['x-jwt-decoded'];
+            if (rawJwt) {
+                const parsedJwt: AuthJwtDecoded = JSON.parse(rawJwt);
+                if (parsedJwt.accessToken) {
+                    return true;
+                }
             }
             return false;
         } catch (error) {
-            console.log(`From AccessTokenGuard: ${error.message}`);
+            console.log(error.stack, error.message);
             return false;
         }
+    }
+
+    async isMemberValid() {
+        try {
+            const rawMember = this.headers['x-member'];
+            if (rawMember) {
+                const parsedMember: Member = JSON.parse(rawMember);
+                if (parsedMember.mbrSeq) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return false;
+        }
+    }
+
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        try {
+            this.headers = context.switchToHttp().getRequest().headers;
+            return await this.validate();
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return false;
+        }
+    }
+
+    abstract validate(): Promise<boolean>;
+}
+
+@Injectable()
+export class AccessTokenGuard extends CoreGuard {
+    validate(): Promise<boolean> {
+        return this.isAccessTokenValid();
     }
 }
 
 @Injectable()
-export class MemberGuard implements CanActivate {
-    canActivate(context: ExecutionContext) {
-        try {
-            const MEMBER_EXISTS = context.switchToHttp().getRequest()
-                .body?.member;
-            const ACCESS_TOKEN_EXISTS = context.switchToHttp().getRequest().body
-                ?.jwt?.accessToken;
-
-            if (MEMBER_EXISTS && ACCESS_TOKEN_EXISTS) {
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.log(`From MemberGuard: ${error.message}`);
-            return false;
-        }
+export class MemberGuard extends CoreGuard {
+    validate(): Promise<boolean> {
+        const promise = this.isAccessTokenValid() && this.isMemberValid();
+        return promise;
     }
 }
