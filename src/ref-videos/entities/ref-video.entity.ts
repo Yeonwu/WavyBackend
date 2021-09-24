@@ -32,11 +32,11 @@ export class RefVideo extends CoreEntity {
     rvSeq: string;
 
     @ApiProperty({
-        type: Number,
+        enum: RefVideoSourceCode,
         description: '학습용 동영상 출처',
     })
-    @Column({ name: 'rv_source', type: 'int' })
-    @IsNumber()
+    @Column({ name: 'rv_source_cd', type: 'varchar', length: 50 })
+    @IsEnum(RefVideoSourceCode)
     rvSource: string;
 
     @ApiProperty({
@@ -67,11 +67,11 @@ export class RefVideo extends CoreEntity {
     rvDuration: string;
 
     @ApiProperty({
-        type: Number,
+        enum: RefVideoDifficultyCode,
         description: '학습용 동영상 난이도',
     })
-    @Column({ name: 'rv_difficulty', type: 'int' })
-    @IsNumber()
+    @Column({ name: 'rv_difficulty_cd', type: 'varchar', length: 50 })
+    @IsEnum(RefVideoDifficultyCode)
     rvDifficulty: string;
 
     @ApiPropertyOptional({ type: String, description: '학습용 동영상 곡명' })
