@@ -28,11 +28,11 @@ export enum PracticeVideoTypeCode {
 }
 
 export enum AnalysisGradeCode {
-    S = 'S',
-    A = 'A',
-    B = 'B',
-    C = 'C',
-    D = 'D',
+    S = '50001',
+    A = '50002',
+    B = '50003',
+    C = '50004',
+    D = '50005',
 }
 
 export enum MemberRefVideoIsBookmarkedCode {}
