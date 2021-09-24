@@ -3,6 +3,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreOutput } from './output.dto';
 
 export class PaginationInput {
+
     @ApiProperty({ type: String, description: '요청한 페이지 숫자' })
     @IsString()
     page: string;
