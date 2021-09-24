@@ -32,13 +32,13 @@ export enum AnalysisGradeCode {}
 export enum MemberRefVideoIsBookmarkedCode {}
 
 export enum MemberExpHistoryLevelCode {
-    LV1 = 800001,
-    LV2 = 800002,
+    LV1 = '800001',
+    LV2 = '800002',
 }
 export enum MemberExpHistoryTierCode {
-    S = 90001,
-    A = 90002,
-    B = 90003,
-    C = 90004,
-    D = 90005,
+    S = '90001',
+    A = '90002',
+    B = '90003',
+    C = '90004',
+    D = '90005',
 }
