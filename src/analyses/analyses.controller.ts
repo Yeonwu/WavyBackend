@@ -24,7 +24,7 @@ import {
     GetAnalysesOutput,
     GetAnalysisBySeqOutput,
 } from './dtos/get-analyses.dto';
-import { SearchAnalysisQuery } from './dtos/search-analyses.dto';
+import { SearchAnalysisInput } from './dtos/search-analyses.dto';
 
 export type SearchAnalysesOrderBy =
     | 'latest'
@@ -50,7 +50,7 @@ export class AnalysesController {
     @UseGuards(MemberGuard)
     searchAnalyses(
         @AuthJwt() jwt: AuthJwtDecoded,
-        @Query() query: SearchAnalysisQuery,
+        @Query() query: SearchAnalysisInput,
     ): Promise<GetAnalysesOutput> {
         const { page, q, orderby } = query;
         return this.analysesService.searchAnalyses(
