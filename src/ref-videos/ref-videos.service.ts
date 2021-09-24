@@ -23,9 +23,6 @@ export class RefVideosService {
         tagName,
     }: RefVideosInput): Promise<RefVideosOutput> {
         try {
-            if (!page) {
-                page = '1';
-            }
             if (!tagName) {
                 tagName = '';
             }
@@ -102,9 +99,6 @@ export class RefVideosService {
         query,
     }: SearchRefVideosInput): Promise<SearchRefVideosOutput> {
         try {
-            if (!page) {
-                page = '1';
-            }
             const [refVideos, totalResults] = await this.refVideos.findAndCount(
                 {
                     where: [

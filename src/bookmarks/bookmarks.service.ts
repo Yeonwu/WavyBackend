@@ -29,16 +29,13 @@ export class BookmarksService {
         { page }: BookmarksInput,
     ): Promise<BookmarksOutput> {
         try {
-            if (!page) {
-                page = 1;
-            }
             const sql = `
                 SELECT * FROM ref_video
                 JOIN (SELECT rv_seq FROM bookmarks
                 WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1}) AS RVSEQ
                 ON RVSEQ.rv_seq = ref_video.rv_seq
                 LIMIT ${PaginationInput.take}
-                OFFSET ${PaginationInput.skip(page)}
+                OFFSET ${PaginationInput.skip(+page)}
             `;
             const sql2 = `
                 SELECT COUNT(ref_video.rv_seq) AS totalresults FROM ref_video

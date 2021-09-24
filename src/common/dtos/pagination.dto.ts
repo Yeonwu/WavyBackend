@@ -1,9 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreOutput } from './output.dto';
 
 export class PaginationInput {
-    @ApiProperty({ type: Number, description: '요청한 페이지 숫자' })
+
+    @ApiProperty({ type: String, description: '요청한 페이지 숫자' })
     @IsString()
     page: string;
 
