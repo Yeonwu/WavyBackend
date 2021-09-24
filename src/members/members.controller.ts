@@ -43,6 +43,27 @@ export class MembersController {
         private readonly mbrStaticsService: MbrStaticsSerivce,
         private readonly mbrExpHistoriesService: MbrExpHistoriesService,
     ) {}
+
+    @Post('exp')
+    @UseGuards(MemberGuard)
+    async createExpHistory(
+        @Body() expHistoryInput: CreateMbrExpHistoryInput,
+        @AuthMember() member: Member,
+    ): Promise<CreateMbrExpHistoryOutput> {
+        return this.mbrExpHistoriesService.createExpHistory(
+            expHistoryInput,
+            member,
+        );
+    }
+
+    @Get('exp')
+    @UseGuards(MemberGuard)
+    async getExpHistory(
+        @AuthMember() member: Member,
+    ): Promise<GetMbrExpHistoryOutput> {
+        return this.mbrExpHistoriesService.getExpHistory(member.mbrSeq);
+    }
+
     @Post('signup')
     @UseGuards(AccessTokenGuard)
     @ApiCreatedResponse({
@@ -104,25 +125,5 @@ export class MembersController {
             dancesGoodAtLimit: dancesGoodAtLimit || null,
             dancesOftenLimit: dancesOftenLimit || null,
         });
-    }
-
-    @Post('exp')
-    @UseGuards(MemberGuard)
-    async createExpHistory(
-        expHistoryInput: CreateMbrExpHistoryInput,
-        @AuthMember() member: Member,
-    ): Promise<CreateMbrExpHistoryOutput> {
-        return this.mbrExpHistoriesService.createExpHistory(
-            expHistoryInput,
-            member.mbrSeq,
-        );
-    }
-
-    @Get('exp')
-    @UseGuards(MemberGuard)
-    async getExpHistory(
-        @AuthMember() member: Member,
-    ): Promise<GetMbrExpHistoryOutput> {
-        return this.mbrExpHistoriesService.getExpHistory(member.mbrSeq);
     }
 }
