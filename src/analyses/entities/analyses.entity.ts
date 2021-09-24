@@ -1,4 +1,5 @@
 import {
+    IsBoolean,
     IsEnum,
     IsNumber,
     IsNumberString,
@@ -29,6 +30,7 @@ export class Analysis extends CoreEntity {
     member: Member;
 
     @RelationId((analysis: Analysis) => analysis.member)
+    @IsNumberString()
     mbrSeq: string;
 
     @ManyToOne((type) => RefVideo, (refVideo) => refVideo.analyses)
@@ -36,7 +38,8 @@ export class Analysis extends CoreEntity {
     refVideo: RefVideo;
 
     @RelationId((analysis: Analysis) => analysis.refVideo)
-    refSeq: string;
+    @IsNumberString()
+    rvSeq: string;
 
     @Column({ name: 'an_score', type: 'int' })
     @IsNumber()
@@ -65,4 +68,8 @@ export class Analysis extends CoreEntity {
     @Column({ name: 'an_simularity_url', type: 'varchar', length: 255 })
     @IsUrl()
     anSimularityURL: string;
+
+    @Column({ name: 'an_deleted', type: 'boolean', default: false })
+    @IsBoolean()
+    anDeleted: boolean;
 }

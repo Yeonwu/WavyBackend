@@ -27,7 +27,13 @@ export enum PracticeVideoTypeCode {
     REF_VIDEO = 'REF_VIDEO',
 }
 
-export enum AnalysisGradeCode {}
+export enum AnalysisGradeCode {
+    S = '50001',
+    A = '50002',
+    B = '50003',
+    C = '50004',
+    D = '50005',
+}
 
 export enum MemberRefVideoIsBookmarkedCode {}
 
