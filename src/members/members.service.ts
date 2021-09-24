@@ -90,7 +90,7 @@ export class MembersService {
     async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
         try {
             if (member.mbrSeq) {
-                return { ok: true, response: { member } };
+                return { ok: true, member };
             }
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
         } catch (error) {

@@ -11,7 +11,5 @@ export class GetMemberOutput extends CoreOutput {
 
 export class getLoggedInMemberOutput extends CoreOutput {
     @IsOptional()
-    response?: {
-        member: Member;
-    };
+    member?: Member;
 }
