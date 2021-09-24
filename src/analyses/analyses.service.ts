@@ -27,7 +27,6 @@ export class AnalysesService {
     constructor(
         @InjectRepository(Analysis)
         private readonly analyses: Repository<Analysis>,
-        private readonly configService: ConfigService,
     ) {}
 
     async getAnalyses(
