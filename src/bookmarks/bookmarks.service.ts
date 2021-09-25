@@ -4,7 +4,7 @@ import * as camelcaseKeys from 'camelcase-keys';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BookmarksInput, BookmarksOutput } from './dtos/bookmarks.dto';
 import {
     CreateBookmarkInput,
@@ -29,21 +29,18 @@ export class BookmarksService {
         { page }: BookmarksInput,
     ): Promise<BookmarksOutput> {
         try {
-            if (!page) {
-                page = 1;
-            }
             const sql = `
                 SELECT * FROM ref_video
                 JOIN (SELECT rv_seq FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1}) AS RVSEQ
+                WHERE mbr_seq = ${authMember.mbrSeq}) AS RVSEQ
                 ON RVSEQ.rv_seq = ref_video.rv_seq
                 LIMIT ${PaginationInput.take}
-                OFFSET ${PaginationInput.skip(page)}
+                OFFSET ${PaginationInput.skip(+page)}
             `;
             const sql2 = `
                 SELECT COUNT(ref_video.rv_seq) AS totalresults FROM ref_video
                 JOIN (SELECT rv_seq FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1}) AS RVSEQ
+                WHERE mbr_seq = ${authMember.mbrSeq}) AS RVSEQ
                 ON RVSEQ.rv_seq = ref_video.rv_seq
             `;
             let sqlRawResults;
@@ -79,30 +76,19 @@ export class BookmarksService {
 
     async createBookmark(
         authMember: Member,
-        { refVideoId }: CreateBookmarkInput,
+        { rvSeq }: CreateBookmarkInput,
     ): Promise<CreateBookmarkOutput> {
         try {
-            const refVideo = await this.refVideos.findOne(refVideoId);
+            const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
                     ok: false,
                     error: '존재하지 않는 학습용 동영상입니다',
                 };
             }
-            // 임시 authMember
-            const tempMember = getRepository(Member).create();
-            tempMember.mbrEmail = 'example@gmail.com';
-            tempMember.mbrNickname = 'example';
-            tempMember.certificationMethodCode = '30001';
-            tempMember.privacyConsentCode = '10001';
-            tempMember.marketingConsentCode = '20001';
-            tempMember.videoOptionCode = '40001';
-            tempMember.creatorSeq = '1';
-            tempMember.updaterSeq = '1';
-
             const sql = `
                 SELECT COUNT(*) FROM bookmarks
-                WHERE mbr_seq = ${199} AND rv_seq = ${refVideoId}
+                WHERE mbr_seq = ${authMember.mbrSeq} AND rv_seq = ${rvSeq}
             `;
             const sqlRawResults = await this.members.query(sql);
             const { count } = sqlRawResults[0];
@@ -112,11 +98,8 @@ export class BookmarksService {
                     error: '이미 보관된 영상입니다',
                 };
             }
-
-            tempMember.bookmarkedRefVideos = [refVideo];
-            // authMember.bookmarkedRefVideos = [refVideo];
-            // await this.members.manager.save(authMember);
-            await this.members.manager.save(tempMember);
+            authMember.bookmarkedRefVideos = [refVideo];
+            await this.members.manager.save(authMember);
             return {
                 ok: true,
                 bookmarkedRefVideo: refVideo,
@@ -131,10 +114,10 @@ export class BookmarksService {
 
     async deleteBookmark(
         authMember: Member,
-        { refVideoId }: DeleteBookmarkInput,
+        { rvSeq }: DeleteBookmarkInput,
     ): Promise<DeleteBookmarkOutput> {
         try {
-            const refVideo = await this.refVideos.findOne(refVideoId);
+            const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
                     ok: false,
@@ -143,8 +126,8 @@ export class BookmarksService {
             }
             const sql = `
                 DELETE FROM bookmarks
-                WHERE mbr_seq = ${authMember ? authMember.mbrSeq : 1} 
-                AND rv_seq = ${refVideoId}
+                WHERE mbr_seq = ${authMember.mbrSeq} 
+                AND rv_seq = ${rvSeq}
             `;
             const sqlRawResults = await this.members.query(sql);
             const count = sqlRawResults[1];

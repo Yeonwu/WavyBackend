@@ -1,10 +1,14 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
+    ApiBearerAuth,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger';
+import { AuthMember } from 'src/auth/auth-member.decorator';
+import { MemberGuard } from 'src/auth/auth.guard';
+import { Member } from 'src/members/entities/members.entity';
 import {
     CreatePracticeInput,
     CreatePracticeOutput,
@@ -13,6 +17,7 @@ import { PracticesTodaySumOutput } from './dtos/practices-today-sum.dto';
 import { PracticesService } from './practices.service';
 
 @ApiTags('연습')
+@ApiBearerAuth('access-token')
 @Controller('practices')
 export class PracticesController {
     constructor(private readonly practicesService: PracticesService) {}
@@ -26,9 +31,10 @@ export class PracticesController {
         type: PracticesTodaySumOutput,
     })
     @Get('/today/sum')
-    getPracticesTodaySum(): Promise<PracticesTodaySumOutput> {
-        // TODO: getPractices의 인자에서 authMember를 받아와야함
-        const authMember = null;
+    @UseGuards(MemberGuard)
+    getPracticesTodaySum(
+        @AuthMember() authMember: Member,
+    ): Promise<PracticesTodaySumOutput> {
         return this.practicesService.allPraticesTodaySum(authMember);
     }
 
@@ -41,11 +47,11 @@ export class PracticesController {
         type: CreatePracticeOutput,
     })
     @Post()
+    @UseGuards(MemberGuard)
     postPractices(
+        @AuthMember() authMember: Member,
         @Body() createPracticeInput: CreatePracticeInput,
     ): Promise<CreatePracticeOutput> {
-        // TODO: getPractices의 인자에서 authMember를 받아와야함
-        const authMember = null;
         return this.practicesService.createPractice(
             authMember,
             createPracticeInput,

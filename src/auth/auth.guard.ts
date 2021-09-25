@@ -40,26 +40,26 @@ abstract class CoreGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
             this.headers = context.switchToHttp().getRequest().headers;
-            return await this.vaildate();
+            return await this.validate();
         } catch (error) {
             console.log(error.stack, error.message);
             return false;
         }
     }
 
-    abstract vaildate(): Promise<boolean>;
+    abstract validate(): Promise<boolean>;
 }
 
 @Injectable()
 export class AccessTokenGuard extends CoreGuard {
-    vaildate(): Promise<boolean> {
+    validate(): Promise<boolean> {
         return this.isAccessTokenValid();
     }
 }
 
 @Injectable()
 export class MemberGuard extends CoreGuard {
-    vaildate(): Promise<boolean> {
+    validate(): Promise<boolean> {
         const promise = this.isAccessTokenValid() && this.isMemberValid();
         return promise;
     }

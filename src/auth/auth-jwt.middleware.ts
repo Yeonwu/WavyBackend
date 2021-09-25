@@ -11,8 +11,10 @@ export class JwtMiddleware implements NestMiddleware {
     ) {}
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            if ('x-jwt' in req.headers) {
-                const token = req.headers['x-jwt'].toString();
+            if ('authorization' in req.headers) {
+                const token = req.headers['authorization']
+                    .toString()
+                    .split(' ')[1];
                 const decoded = this.jwtService.verify(token);
 
                 if (typeof decoded === 'object') {
