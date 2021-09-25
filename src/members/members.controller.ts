@@ -27,16 +27,44 @@ import { MbrStaticsSerivce } from './mbr-statics.service';
 import { AccessTokenGuard, MemberGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
-import { AuthJwt } from 'src/auth/auth-jwt.decorator';
-import { AuthMember } from 'src/auth/auth-member.decorator';
+import {
+    CreateMbrExpHistoryInput,
+    CreateMbrExpHistoryOutput,
+} from './dtos/create-mbr-exp-history';
+import { GetMbrExpHistoryOutput } from './dtos/get-mbr-exp-history';
+import { MbrExpHistoriesService } from './mbr-exp-histories.service';
 import { Member } from './entities/members.entity';
+import { AuthMember } from 'src/auth/auth-member.decorator';
+import { AuthJwt } from 'src/auth/auth-jwt.decorator';
 
 @Controller('members')
 export class MembersController {
     constructor(
         private readonly membersSerivce: MembersService,
         private readonly mbrStaticsService: MbrStaticsSerivce,
+        private readonly mbrExpHistoriesService: MbrExpHistoriesService,
     ) {}
+
+    @Post('exp')
+    @UseGuards(MemberGuard)
+    async createExpHistory(
+        @Body() expHistoryInput: CreateMbrExpHistoryInput,
+        @AuthMember() member: Member,
+    ): Promise<CreateMbrExpHistoryOutput> {
+        return this.mbrExpHistoriesService.createExpHistory(
+            expHistoryInput,
+            member,
+        );
+    }
+
+    @Get('exp')
+    @UseGuards(MemberGuard)
+    async getExpHistory(
+        @AuthMember() member: Member,
+    ): Promise<GetMbrExpHistoryOutput> {
+        return this.mbrExpHistoriesService.getExpHistory(member.mbrSeq);
+    }
+
     @Post('signup')
     @UseGuards(AccessTokenGuard)
     @ApiCreatedResponse({
