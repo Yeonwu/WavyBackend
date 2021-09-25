@@ -1,12 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-    IsNumber,
+    IsEnum,
     IsNumberString,
     IsOptional,
     IsString,
     IsUrl,
 } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { PracticeVideoTypeCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
@@ -36,12 +37,12 @@ export class Practice extends CoreEntity {
     ptFinished: string;
 
     @ApiProperty({
-        type: Number,
+        enum: PracticeVideoTypeCode,
         description: '연습에 사용된 영상의 타입(학습용 영상 또는 유튜브 영상)',
     })
-    @Column({ name: 'pt_video_type_cd', type: 'int' })
-    @IsNumber()
-    ptVideoTypeCode: number;
+    @Column({ name: 'pt_video_type_cd', type: 'varchar', length: 50 })
+    @IsEnum(PracticeVideoTypeCode)
+    ptVideoTypeCode: string;
 
     @ApiPropertyOptional({
         type: String,
