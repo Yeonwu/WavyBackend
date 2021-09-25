@@ -86,7 +86,6 @@ export class BookmarksService {
                     error: '존재하지 않는 학습용 동영상입니다',
                 };
             }
-
             const sql = `
                 SELECT COUNT(*) FROM bookmarks
                 WHERE mbr_seq = ${authMember.mbrSeq} AND rv_seq = ${rvSeq}

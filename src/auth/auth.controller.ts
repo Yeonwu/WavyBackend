@@ -42,12 +42,6 @@ export class AuthController {
         return this.authService.unlinkToken(accessToken);
     }
 
-    @Get('me')
-    @UseGuards(MemberGuard)
-    getLoggedInMember(@AuthMember() member: Member) {
-        return this.authService.getLoggedInMember(member);
-    }
-
     @Get('test/login')
     getLoginPage() {
         return `<div>
