@@ -14,7 +14,10 @@ import {
     DeleteMemberOption,
     DeleteMemberOutput,
 } from './dtos/delete-member.dto';
-import { GetMemberOutput } from './dtos/get-member.dto';
+import {
+    getLoggedInMemberOutput,
+    GetMemberOutput,
+} from './dtos/get-member.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
@@ -84,9 +87,21 @@ export class MembersService {
         return MEMBER_EXISTS && IS_MEMBER_NOT_DELETED;
     }
 
-    async getMemberBySeq(memberSeq: string): Promise<GetMemberOutput> {
+    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
         try {
-            const member = await this.members.findOne(memberSeq);
+            if (member.mbrSeq) {
+                return { ok: true, member };
+            }
+            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
+        } catch (error) {
+            console.log(error.message);
+            return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
+        }
+    }
+
+    async getMemberBySeq(mbrSeq: string): Promise<GetMemberOutput> {
+        try {
+            const member = await this.members.findOne(mbrSeq);
 
             if (this.checkMemberExists(member)) {
                 return { ok: false, error: '존재하지 않는 회원입니다.' };
@@ -127,13 +142,12 @@ export class MembersService {
         try {
             const getMemberResult = await this.getMemberBySeq(memberSeq);
             const member = getMemberResult?.member;
-            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
 
-            if (getMemberResult.ok) {
+            if (!getMemberResult.ok) {
                 return getMemberResult;
             }
 
-            member.updaterSeq = systemMbrSeq;
+            member.updaterSeq = member.mbrSeq;
 
             member.mbrNickname =
                 updateMemberInput.mbrNickname ?? member.mbrNickname;

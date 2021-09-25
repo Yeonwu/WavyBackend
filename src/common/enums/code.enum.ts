@@ -1,33 +1,47 @@
 export enum MemberCertificationMethodCode {
-    KAKAO = 'KAKAO',
+    NAVER = '30001',
+    KAKAO = '30002',
+    FACEBOOK = '30003',
+    GOOGLE = '30004',
+    EMAIL = '30005',
 }
 export enum MemberMarketingConsentCode {
-    'test',
+    Y = '20001',
+    N = '20002',
 }
 export enum MemberPrivacyConsentCode {
-    'test',
+    Y = '10001',
+    N = '10002',
 }
 export enum MemberVideoOptionCode {
-    'test',
+    HIGH = '40001',
+    MEDIUM = '40002',
+    LOW = '40003',
 }
 
 export enum RefVideoDifficultyCode {
-    EASY = 'EASY',
-    NORMAL = 'NORMAL',
-    DIFFICULT = 'DIFFICULT',
+    EASY = '110001',
+    NORMAL = '110002',
+    DIFFICULT = '110003',
 }
 export enum RefVideoSourceCode {
-    YOUTUBE = 'YOUTUBE',
-    TICKTOK = 'TICKTOK',
-    WAVY = 'WAVY',
+    YOUTUBE = '100001',
+    TICKTOK = '100002',
+    WAVY = '100003',
 }
 
 export enum PracticeVideoTypeCode {
-    YOUTUBE = 'YOUTUBE',
-    REF_VIDEO = 'REF_VIDEO',
+    YOUTUBE = '60001',
+    REF_VIDEO = '60002',
 }
 
-export enum AnalysisGradeCode {}
+export enum AnalysisGradeCode {
+    S = '50001',
+    A = '50002',
+    B = '50003',
+    C = '50004',
+    D = '50005',
+}
 
 export enum MemberRefVideoIsBookmarkedCode {}
 
