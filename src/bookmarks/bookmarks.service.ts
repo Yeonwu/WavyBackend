@@ -93,10 +93,10 @@ export class BookmarksService {
             const tempMember = getRepository(Member).create();
             tempMember.mbrEmail = 'example@gmail.com';
             tempMember.mbrNickname = 'example';
-            tempMember.certificationMethodCode = 30001;
-            tempMember.privacyConsentCode = 10001;
-            tempMember.marketingConsentCode = 20001;
-            tempMember.videoOptionCode = 40001;
+            tempMember.certificationMethodCode = '30001';
+            tempMember.privacyConsentCode = '10001';
+            tempMember.marketingConsentCode = '20001';
+            tempMember.videoOptionCode = '40001';
             tempMember.creatorSeq = '1';
             tempMember.updaterSeq = '1';
 

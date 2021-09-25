@@ -1,22 +1,22 @@
 export enum MemberCertificationMethodCode {
-    NAVER = 30001,
-    KAKAO = 30002,
-    FACEBOOK = 30003,
-    GOOGLE = 30004,
-    EMAIL = 30005,
+    NAVER = '30001',
+    KAKAO = '30002',
+    FACEBOOK = '30003',
+    GOOGLE = '30004',
+    EMAIL = '30005',
 }
 export enum MemberMarketingConsentCode {
-    Y = 20001,
-    N = 20002,
+    Y = '20001',
+    N = '20002',
 }
 export enum MemberPrivacyConsentCode {
-    Y = 10001,
-    N = 10002,
+    Y = '10001',
+    N = '10002',
 }
 export enum MemberVideoOptionCode {
-    HIGH = 40001,
-    MEDIUM = 40002,
-    LOW = 40003,
+    HIGH = '40001',
+    MEDIUM = '40002',
+    LOW = '40003',
 }
 
 export enum RefVideoDifficultyCode {
