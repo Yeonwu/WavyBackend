@@ -10,6 +10,17 @@ async function bootstrap() {
         .setTitle('Wavy API')
         .setDescription('Wavy API 문서')
         .setVersion('0.1')
+        .addBearerAuth(
+            {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+                name: 'JWT',
+                description: 'JWT token을 입력해주세요',
+                in: 'header',
+            },
+            'access-token',
+        )
         .build();
 
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);

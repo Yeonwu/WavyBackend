@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
+    ApiBearerAuth,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
@@ -16,6 +17,7 @@ import { PracticesTodaySumOutput } from './dtos/practices-today-sum.dto';
 import { PracticesService } from './practices.service';
 
 @ApiTags('연습')
+@ApiBearerAuth('access-token')
 @Controller('practices')
 export class PracticesController {
     constructor(private readonly practicesService: PracticesService) {}
