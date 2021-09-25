@@ -65,8 +65,8 @@ export class MbrExpHistoriesService {
         const EmptyExpHistory = new MemberExpHistory();
         EmptyExpHistory.mehExpAcc = 0;
         EmptyExpHistory.mehExpGained = 0;
-        EmptyExpHistory.mehLevel = '' + MemberExpHistoryLevelCode.LV1;
-        EmptyExpHistory.mehTier = '' + MemberExpHistoryTierCode.D;
+        EmptyExpHistory.mehLevel = MemberExpHistoryLevelCode.LV1;
+        EmptyExpHistory.mehTier = MemberExpHistoryTierCode.D;
         return EmptyExpHistory;
     }
 
@@ -87,10 +87,8 @@ export class MbrExpHistoriesService {
         newExpHistory.mehExpGained = expGained;
         newExpHistory.member = member;
         newExpHistory.mehExpAcc = expHistory.mehExpAcc + expGained;
-        newExpHistory.mehLevel =
-            '' + this.calculateLevel(newExpHistory.mehExpAcc);
-        newExpHistory.mehTier =
-            '' + this.calculateTier(newExpHistory.mehExpAcc);
+        newExpHistory.mehLevel = this.calculateLevel(newExpHistory.mehExpAcc);
+        newExpHistory.mehTier = this.calculateTier(newExpHistory.mehExpAcc);
 
         return newExpHistory;
     }
