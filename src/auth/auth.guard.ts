@@ -1,18 +1,28 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+    CanActivate,
+    ExecutionContext,
+    HttpStatus,
+    Injectable,
+} from '@nestjs/common';
+import got from 'got';
 import { Member } from 'src/members/entities/members.entity';
 import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 
 abstract class CoreGuard implements CanActivate {
     private headers: Record<string, string>;
 
-    async isAccessTokenValid() {
+    async isAccessTokenValid(): Promise<boolean> {
         try {
             const rawJwt = this.headers['x-jwt-decoded'];
-            if (rawJwt) {
-                const parsedJwt: AuthJwtDecoded = JSON.parse(rawJwt);
-                if (parsedJwt.accessToken) {
-                    return true;
-                }
+            const parsedJwt: AuthJwtDecoded = JSON.parse(rawJwt);
+            if (parsedJwt.accessToken) {
+                const url = 'https://kapi.kakao.com/v1/user/access_token_info';
+                const response = await got.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${parsedJwt.accessToken}`,
+                    },
+                });
+                return response.statusCode === HttpStatus.OK;
             }
             return false;
         } catch (error) {
@@ -52,15 +62,16 @@ abstract class CoreGuard implements CanActivate {
 
 @Injectable()
 export class AccessTokenGuard extends CoreGuard {
-    validate(): Promise<boolean> {
+    async validate(): Promise<boolean> {
         return this.isAccessTokenValid();
     }
 }
 
 @Injectable()
 export class MemberGuard extends CoreGuard {
-    validate(): Promise<boolean> {
-        const promise = this.isAccessTokenValid() && this.isMemberValid();
+    async validate(): Promise<boolean> {
+        const promise =
+            (await this.isAccessTokenValid()) && (await this.isMemberValid());
         return promise;
     }
 }

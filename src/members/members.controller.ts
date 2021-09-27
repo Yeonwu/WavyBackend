@@ -80,8 +80,8 @@ export class MembersController {
 
     @Get('me')
     @UseGuards(MemberGuard)
-    getLoggedInMember(@AuthMember() member: Member) {
-        return this.membersSerivce.getLoggedInMember(member);
+    async getLoggedInMember(@AuthMember() member: Member) {
+        return await this.membersSerivce.getLoggedInMember(member);
     }
 
     @Get(':id')

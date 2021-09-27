@@ -27,7 +27,7 @@ export class JwtMiddleware implements NestMiddleware {
 
                         if (!ok) {
                             throw new Error(
-                                `From JwtMiddleWare: Cannot find Member by mbrSeq(${decoded.mbrSeq}).`,
+                                `Cannot find Member by mbrSeq(${decoded.mbrSeq}).`,
                             );
                         }
                         req.headers['x-member'] = JSON.stringify(member);

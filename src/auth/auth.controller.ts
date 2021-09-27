@@ -5,9 +5,7 @@ import {
     ApiExcludeEndpoint,
     ApiOkResponse,
     ApiOperation,
-    ApiProperty,
     ApiQuery,
-    ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { AuthJwt } from './auth-jwt.decorator';
