@@ -21,7 +21,13 @@ import {
     UpdateMemberInput,
     UpdateMemberOutput,
 } from './dtos/update-member.dto';
-import { ApiCreatedResponse, ApiResponse } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiCreatedResponse,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { MbrStaticsSerivce } from './mbr-statics.service';
 import { AccessTokenGuard, MemberGuard } from 'src/auth/auth.guard';
@@ -37,6 +43,8 @@ import { Member } from './entities/members.entity';
 import { AuthMember } from 'src/auth/auth-member.decorator';
 import { AuthJwt } from 'src/auth/auth-jwt.decorator';
 
+@ApiTags('회원')
+@ApiBearerAuth('access-token')
 @Controller('members')
 export class MembersController {
     constructor(
@@ -45,6 +53,17 @@ export class MembersController {
         private readonly mbrExpHistoriesService: MbrExpHistoriesService,
     ) {}
 
+    @ApiOperation({
+        summary: '회원 경험치 등록',
+        description:
+            '회원이 경험치를 획득했을 경우 호출하여 회원 경험치를 등록합니다.',
+    })
+    @ApiResponse({
+        status: 201,
+        description:
+            '회원 경험치를 등록하고, 갱신된 회원 경험치 이력을 불러옵니다.',
+        type: CreateMbrExpHistoryOutput,
+    })
     @Post('exp')
     @UseGuards(MemberGuard)
     async createExpHistory(
@@ -58,6 +77,15 @@ export class MembersController {
     }
 
     @Get('exp')
+    @ApiOperation({
+        summary: '회원 경험치 이력 조회',
+        description: '최신 회원 경험치 이력을 불러옵니다.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: '최신 회원 경험치 이력을 불러옵니다.',
+        type: GetMbrExpHistoryOutput,
+    })
     @UseGuards(MemberGuard)
     async getExpHistory(
         @AuthMember() member: Member,
