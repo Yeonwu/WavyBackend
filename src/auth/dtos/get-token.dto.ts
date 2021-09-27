@@ -1,6 +1,5 @@
-import { IsJWT, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsJWT, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { Member } from 'src/members/entities/members.entity';
 
 export class GetJwtOutput extends CoreOutput {
     @IsJWT()
