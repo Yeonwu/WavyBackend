@@ -15,8 +15,15 @@ import {
     CreateMemberOutput,
 } from './dtos/create-member.dto';
 import { DeleteMemberOutput } from './dtos/delete-member.dto';
-import { GetMemberOutput } from './dtos/get-member.dto';
-import { GetStaticsOuput } from './dtos/get-statics.dto';
+import {
+    getLoggedInMemberOutput,
+    GetMemberOutput,
+} from './dtos/get-member.dto';
+import {
+    GetStaticsInput,
+    GetStaticsOptions,
+    GetStaticsOuput,
+} from './dtos/get-statics.dto';
 import {
     UpdateMemberInput,
     UpdateMemberOutput,
@@ -24,7 +31,9 @@ import {
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
+    ApiOkResponse,
     ApiOperation,
+    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -76,7 +85,6 @@ export class MembersController {
         );
     }
 
-    @Get('exp')
     @ApiOperation({
         summary: '회원 경험치 이력 조회',
         description: '최신 회원 경험치 이력을 불러옵니다.',
@@ -86,6 +94,7 @@ export class MembersController {
         description: '최신 회원 경험치 이력을 불러옵니다.',
         type: GetMbrExpHistoryOutput,
     })
+    @Get('exp')
     @UseGuards(MemberGuard)
     async getExpHistory(
         @AuthMember() member: Member,
@@ -93,43 +102,61 @@ export class MembersController {
         return this.mbrExpHistoriesService.getExpHistory(member.mbrSeq);
     }
 
-    @Post('signup')
     @UseGuards(AccessTokenGuard)
+    @ApiOperation({
+        summary: '회원 등록',
+        description: '회원 가입시 호출하여 회원 정보를 등록합니다.',
+    })
     @ApiCreatedResponse({
-        description: '회원가입 API',
+        description: '회원을 등록하고 등록한 정보를 불러옵니다.',
         type: CreateMemberOutput,
     })
+    @Post('signup')
     async createMember(
-        @Body('member') createMemberInput: CreateMemberInput,
+        @Body() createMemberInput: CreateMemberInput,
         @AuthJwt() jwt: AuthJwtDecoded,
     ): Promise<CreateMemberOutput> {
         return await this.membersSerivce.createMember(createMemberInput, jwt);
     }
 
+    @ApiOperation({
+        summary: '로그인한 유저 정보 조회',
+        description: '로그인한 유저의 정보를 불러옵니다.',
+    })
+    @ApiOkResponse({
+        description: '로그인한 유저의 정보를 불러옵니다.',
+        type: getLoggedInMemberOutput,
+    })
     @Get('me')
     @UseGuards(MemberGuard)
-    getLoggedInMember(@AuthMember() member: Member) {
+    getLoggedInMember(@AuthMember() member: Member): getLoggedInMemberOutput {
         return this.membersSerivce.getLoggedInMember(member);
     }
 
+    @ApiOperation({
+        summary: '회원 정보 조회',
+        description: '회원 일련번호를 통해 해당 회원의 정보를 불러옵니다.',
+    })
     @Get(':id')
     @UseGuards(MemberGuard)
-    @ApiResponse({
-        status: 200,
-        description: '회원정보 조회 API',
+    @ApiOkResponse({
+        description: '회원 정보를 조회합니다.',
         type: GetMemberOutput,
     })
     async getMemberByID(@Param('id') id: string): Promise<GetMemberOutput> {
         return await this.membersSerivce.getMemberBySeq(id);
     }
 
-    @Put()
-    @UseGuards(MemberGuard)
-    @ApiResponse({
-        status: 200,
-        description: '회원정보 수정 API',
+    @ApiOperation({
+        summary: '회원정보 수정',
+        description: '로그인한 회원의 정보를 수정합니다.',
+    })
+    @ApiOkResponse({
+        description: '회원정보를 수정합니다.',
         type: UpdateMemberOutput,
     })
+    @Put()
+    @UseGuards(MemberGuard)
     async updateMember(
         @AuthMember() member: Member,
         @Body() updateMemberInput: UpdateMemberInput,
@@ -140,12 +167,15 @@ export class MembersController {
         );
     }
 
-    @Delete()
-    @ApiResponse({
-        status: 200,
-        description: '회원 탈퇴 API',
+    @ApiOperation({
+        summary: '회원 탈퇴',
+        description: '로그인한 회원의 정보를 삭제하고 탈퇴합니다.',
+    })
+    @ApiOkResponse({
+        description: '회원 정보를 삭제하고 탈퇴합니다. ',
         type: DeleteMemberOutput,
     })
+    @Delete()
     @UseGuards(MemberGuard)
     async deleteMember(
         @AuthMember() member: Member,
@@ -153,22 +183,30 @@ export class MembersController {
         return await this.membersSerivce.deleteMember(member.mbrSeq);
     }
 
-    @Get(':id/statics')
-    @UseGuards(MemberGuard)
-    @ApiResponse({
-        status: 200,
-        description: '회원 통계 조회 API',
+    @ApiOperation({
+        summary: '회원 통계 조회',
+        description: '회원의 통계 정보를 불러옵니다.',
+    })
+    @ApiOkResponse({
+        description: '회원 통계 정보를 불러옵니다.',
         type: GetStaticsOuput,
     })
+    @ApiQuery({ type: GetStaticsInput })
+    @Get(':id/statics')
+    @UseGuards(MemberGuard)
     async getStatics(
         @Param('id') id: string,
         @AuthMember() member: Member,
-        @Query('dancegoodlimit') dancesGoodAtLimit?: number,
-        @Query('danceoftenlimit') dancesOftenLimit?: number,
+        @Query() getStaticsInput: GetStaticsInput,
     ): Promise<GetStaticsOuput> {
-        return await this.mbrStaticsService.getStatics(id, member.mbrSeq, {
-            dancesGoodAtLimit: dancesGoodAtLimit || null,
-            dancesOftenLimit: dancesOftenLimit || null,
-        });
+        const options: GetStaticsOptions = {
+            dancesGoodAtLimit: getStaticsInput?.dancegoodlimit,
+            dancesOftenLimit: getStaticsInput?.danceoftenlimit,
+        };
+        return await this.mbrStaticsService.getStatics(
+            id,
+            member.mbrSeq,
+            options,
+        );
     }
 }

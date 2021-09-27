@@ -35,11 +35,11 @@ import {
 export class Member extends CoreEntity {
     @PrimaryGeneratedColumn({ name: 'mbr_seq', type: 'bigint' })
     @IsNumberString()
-    @ApiProperty()
+    @ApiProperty({ name: 'mbrSeq', description: '회원 일련번호', type: String })
     mbrSeq: string;
 
     @Column({ name: 'mbr_email', type: 'varchar', length: 255 })
-    @ApiProperty()
+    @ApiProperty({ description: '회원 이메일', type: String })
     @IsEmail()
     mbrEmail: string;
 
@@ -49,7 +49,11 @@ export class Member extends CoreEntity {
     mbrKakaoSeq: string;
 
     @Column({ name: 'mbr_nickname', type: 'varchar', length: 255 })
-    @ApiProperty()
+    @ApiProperty({
+        name: 'mbrNickname',
+        description: '회원 닉네임',
+        type: String,
+    })
     @IsString()
     mbrNickname: string;
 
@@ -58,7 +62,11 @@ export class Member extends CoreEntity {
         type: 'varchar',
         length: 50,
     })
-    @ApiProperty()
+    @ApiProperty({
+        description:
+            '인증 방법 코드. 회원이 카카오, 페이스북 등 어떤 방법으로 로그인하는지에 대한 정보',
+        enum: MemberCertificationMethodCode,
+    })
     @IsEnum(MemberCertificationMethodCode)
     certificationMethodCode: string;
 
@@ -68,17 +76,23 @@ export class Member extends CoreEntity {
         length: 255,
         nullable: true,
     })
-    @ApiProperty()
+    @ApiProperty({ description: '회원 프로필 이미지 URL', type: String })
     @IsUrl()
     profileImageUrl: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
-    @ApiProperty()
+    @ApiProperty({
+        description: '개인정보이용약관 동의코드',
+        enum: MemberPrivacyConsentCode,
+    })
     @IsEnum(MemberPrivacyConsentCode)
     privacyConsentCode: string;
 
     @Column({ name: 'mbr_marketing_consent', type: 'varchar', length: 50 })
-    @ApiProperty()
+    @ApiProperty({
+        description: '마케팅수집이용 동의코드',
+        enum: MemberMarketingConsentCode,
+    })
     @IsEnum(MemberMarketingConsentCode)
     marketingConsentCode: string;
 
@@ -88,7 +102,10 @@ export class Member extends CoreEntity {
         length: 50,
         default: '40002',
     })
-    @ApiProperty()
+    @ApiProperty({
+        description: '영상인식옵션 코드',
+        enum: MemberVideoOptionCode,
+    })
     @IsEnum(MemberVideoOptionCode)
     videoOptionCode: string;
 

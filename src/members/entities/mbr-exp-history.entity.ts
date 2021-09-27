@@ -22,10 +22,10 @@ export class MemberExpHistory extends CoreEntity {
     @ApiProperty({
         name: 'mehSeq',
         description: '회원 경험치 이력 일련번호',
-        type: Number,
+        type: String,
     })
     @IsNumberString()
-    mehSeq: number;
+    mehSeq: string;
 
     @ManyToOne((type) => Member, (member) => member.memberExpHistories)
     @ApiProperty({
@@ -46,7 +46,7 @@ export class MemberExpHistory extends CoreEntity {
 
     @Column({ name: 'meh_exp_gained', type: 'int' })
     @ApiProperty({
-        name: 'mehExp',
+        name: 'mehExpGained',
         description: '획득한 경험치',
         type: Number,
     })
