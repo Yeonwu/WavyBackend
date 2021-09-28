@@ -61,7 +61,10 @@ export class MembersService {
                         await this.authService.getMbrKakaoSeq(jwt.accessToken);
                     break;
                 default:
-                    return { ok: false, error: '회원가입에 실패했습니다.' };
+                    return {
+                        ok: false,
+                        error: '현재 카카오계정 외의 로그인 방법은 제공하지 않고 있습니다.',
+                    };
             }
 
             const newMember = this.buildMember(newMemberInput);
@@ -87,7 +90,7 @@ export class MembersService {
         return MEMBER_EXISTS && IS_MEMBER_NOT_DELETED;
     }
 
-    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
+    getLoggedInMember(member: Member): getLoggedInMemberOutput {
         try {
             if (member.mbrSeq) {
                 return { ok: true, member };

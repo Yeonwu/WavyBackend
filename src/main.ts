@@ -8,7 +8,13 @@ async function bootstrap() {
 
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Wavy API')
-        .setDescription('Wavy API 문서')
+        .setDescription(
+            `
+        Wavy API 문서
+        
+        일련번호, ID, Seq 등은 모두 같은 뜻입니다.
+        `,
+        )
         .setVersion('0.1')
         .addBearerAuth(
             {
@@ -24,7 +30,7 @@ async function bootstrap() {
         .build();
 
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api', app, swaggerDocument);
+    SwaggerModule.setup('api/docs', app, swaggerDocument);
 
     app.useGlobalPipes(
         new ValidationPipe({
