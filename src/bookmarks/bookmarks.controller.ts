@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    Param,
     Post,
     Query,
     UseGuards,
@@ -19,6 +20,7 @@ import { MemberGuard } from 'src/auth/auth.guard';
 import { Member } from 'src/members/entities/members.entity';
 import { BookmarksService } from './bookmarks.service';
 import { BookmarksInput, BookmarksOutput } from './dtos/bookmarks.dto';
+import { CheckBookmarkOutput } from './dtos/check-bookmark.dto';
 import {
     CreateBookmarkInput,
     CreateBookmarkOutput,
@@ -48,6 +50,23 @@ export class BookmarksController {
         @Query() bookmarksInput: BookmarksInput,
     ): Promise<BookmarksOutput> {
         return this.bookmarksService.allBookmarks(authMember, bookmarksInput);
+    }
+
+    @ApiOperation({
+        summary: '학습용 영상의 북마크 여부 조회',
+        description: '학습용 영상의 북마크 여부를 조회한다',
+    })
+    @ApiOkResponse({
+        description: '학습용 영상의 북마크 여부를 조회한다',
+        type: CheckBookmarkOutput,
+    })
+    @Get('/ref-videos/:id')
+    @UseGuards(MemberGuard)
+    checkBookmark(
+        @AuthMember() authMember: Member,
+        @Param('id') refVideoId: string,
+    ): Promise<CheckBookmarkOutput> {
+        return this.bookmarksService.checkBookmark(authMember, refVideoId);
     }
 
     @ApiOperation({
