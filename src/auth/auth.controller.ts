@@ -1,12 +1,22 @@
-import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Member } from 'src/members/entities/members.entity';
+import {
+    ApiBearerAuth,
+    ApiExcludeEndpoint,
+    ApiOkResponse,
+    ApiOperation,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { AuthJwt } from './auth-jwt.decorator';
-import { AuthMember } from './auth-member.decorator';
-import { AccessTokenGuard, MemberGuard } from './auth.guard';
+import { AccessTokenGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthJwtDecoded } from './dtos/auth-jwt-core';
+import { GetKakoLoginUrlOutput } from './dtos/get-kakak-login-url.dto';
+import { UnlinkTokenOutput } from './dtos/get-token.dto';
+import { KakaoRedirectInput } from './dtos/kakao-redirect.dto';
 
+@ApiTags('인증')
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -14,19 +24,28 @@ export class AuthController {
         private readonly configService: ConfigService,
     ) {}
 
+    @ApiOperation({
+        summary: '카카오 로그인 URL 받기',
+        description: `카카오 로그인 창으로 들어가는 URL을 받아옵니다.`,
+    })
+    @ApiOkResponse({
+        description: '카카오 로그인 창으로 들어가는 URL을 받아옵니다.',
+        type: GetKakoLoginUrlOutput,
+    })
     @Get('kakaoLogin')
-    getKakaoLogin(@Res() res) {
-        const url = this.authService.getKakaoLoginUrl();
-        return res.redirect(url);
+    getKakaoLogin() {
+        return this.authService.getKakaoLoginUrl();
     }
 
+    @ApiOperation({
+        summary: '카카오 로그인 후 리다이렉트되는 URL',
+    })
+    @ApiQuery({
+        type: KakaoRedirectInput,
+    })
     @Get('kakaoLoginRedirect')
-    kakaoLoginRedirect(
-        @Query('code') code: string,
-        @Query('state') state?: string,
-        @Query('error') error?: string,
-        @Query('error_description') error_description?: string,
-    ) {
+    kakaoLoginRedirect(@Query() query: KakaoRedirectInput) {
+        const { code, state, error, error_description } = query;
         if (error) {
             console.log(`${state} / ${error}: ${error_description}`);
             return { ok: false, error: '카카오 로그인에 실패했습니다.' };
@@ -35,13 +54,26 @@ export class AuthController {
         return this.authService.getJwt(code);
     }
 
+    @ApiOperation({
+        summary: '카카오 로그아웃 Url',
+        description:
+            '카카오로 가입한 회원이 로그아웃시 호출해 주신 후 jwt를 저장해 놓았을 경우 지워주세요.',
+    })
+    @ApiOkResponse({
+        description: '회원 로그아웃 완료',
+        type: UnlinkTokenOutput,
+    })
+    @ApiBearerAuth('access-token')
     @Get('kakaoLogout')
     @UseGuards(AccessTokenGuard)
-    kakaoLogout(@AuthJwt() jwt: AuthJwtDecoded) {
+    async kakaoLogout(
+        @AuthJwt() jwt: AuthJwtDecoded,
+    ): Promise<UnlinkTokenOutput> {
         const accessToken = jwt.accessToken;
-        return this.authService.unlinkToken(accessToken);
+        return await this.authService.unlinkToken(accessToken);
     }
 
+    @ApiExcludeEndpoint()
     @Get('test/login')
     getLoginPage() {
         return `<div>

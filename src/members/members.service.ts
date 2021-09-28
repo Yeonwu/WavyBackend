@@ -84,10 +84,9 @@ export class MembersService {
     }
 
     private checkMemberExists(member: Member) {
-        const MEMBER_EXISTS = !member;
-        const IS_MEMBER_NOT_DELETED = member?.mbrDeleted;
-
-        return MEMBER_EXISTS && IS_MEMBER_NOT_DELETED;
+        const MEMBER_EXISTS = member;
+        const IS_MEMBER_DELETED = !member.mbrDeleted;
+        return MEMBER_EXISTS && !IS_MEMBER_DELETED;
     }
 
     getLoggedInMember(member: Member): getLoggedInMemberOutput {

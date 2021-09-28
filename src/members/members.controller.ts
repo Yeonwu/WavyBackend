@@ -129,8 +129,8 @@ export class MembersController {
     })
     @Get('me')
     @UseGuards(MemberGuard)
-    getLoggedInMember(@AuthMember() member: Member): getLoggedInMemberOutput {
-        return this.membersSerivce.getLoggedInMember(member);
+    async getLoggedInMember(@AuthMember() member: Member) {
+        return await this.membersSerivce.getLoggedInMember(member);
     }
 
     @ApiOperation({

@@ -10,6 +10,7 @@ import {
 } from './dtos/get-token.dto';
 import * as camelcaseKeys from 'camelcase-keys';
 import { Member } from 'src/members/entities/members.entity';
+import { GetKakoLoginUrlOutput } from './dtos/get-kakak-login-url.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,14 +21,22 @@ export class AuthService {
         private readonly configService: ConfigService,
     ) {}
 
-    getKakaoLoginUrl(): string {
-        const hostName = this.configService.get('KAKAO_LOGIN_HOST');
-        const clientId = this.configService.get('KAKAO_CLIENT_ID');
-        const baseDomain = this.configService.get('BASE_DOMAIN');
-        const redirectUrl = `${baseDomain}/auth/kakaoLoginRedirect`;
+    getKakaoLoginUrl(): GetKakoLoginUrlOutput {
+        try {
+            const hostName = this.configService.get('KAKAO_LOGIN_HOST');
+            const clientId = this.configService.get('KAKAO_CLIENT_ID');
+            const baseDomain = this.configService.get('BASE_DOMAIN');
+            const redirectUrl = `${baseDomain}/auth/kakaoLoginRedirect`;
 
-        const url = `https://${hostName}/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code`;
-        return url;
+            const url = `https://${hostName}/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code`;
+            return { ok: true, url };
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return {
+                ok: false,
+                error: '카카오 로그인 URL을 받아오지 못했습니다.',
+            };
+        }
     }
 
     async getJwt(code: string): Promise<GetJwtOutput> {
