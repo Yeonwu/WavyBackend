@@ -8,12 +8,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtMiddleware } from 'src/auth/auth-jwt.middleware';
 import { AuthModule } from 'src/auth/auth.module';
 import { MembersModule } from 'src/members/members.module';
+import { RefVideosModule } from 'src/ref-videos/ref-videos.module';
 import { AnalysesController } from './analyses.controller';
 import { AnalysesService } from './analyses.service';
 import { Analysis } from './entities/analyses.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Analysis]), AuthModule, MembersModule],
+    imports: [
+        TypeOrmModule.forFeature([Analysis]),
+        AuthModule,
+        MembersModule,
+        RefVideosModule,
+    ],
     controllers: [AnalysesController],
     providers: [AnalysesService],
 })
