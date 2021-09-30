@@ -4,6 +4,7 @@ import {
     IsEnum,
     IsNumber,
     IsNumberString,
+    IsOptional,
     IsString,
     IsUrl,
 } from 'class-validator';
@@ -58,25 +59,36 @@ export class Analysis extends CoreEntity {
     @ApiProperty({
         description: '점수',
         type: Number,
+        nullable: true,
     })
-    @Column({ name: 'an_score', type: 'int' })
+    @Column({ name: 'an_score', type: 'int', nullable: true })
     @IsNumber()
+    @IsOptional()
     anScore: number;
 
     @ApiProperty({
         description: '등급 코드',
         enum: AnalysisGradeCode,
+        nullable: true,
     })
-    @Column({ name: 'an_grade_cd', type: 'varchar', length: 50 })
+    @Column({
+        name: 'an_grade_cd',
+        type: 'varchar',
+        length: 50,
+        nullable: true,
+    })
     @IsEnum(AnalysisGradeCode)
+    @IsOptional()
     anGradeCode: string;
 
     @ApiProperty({
         description: '사용자 영상 길이. hh:mm:ss 형식으로 표현됨.',
         type: String,
+        nullable: true,
     })
-    @Column({ name: 'an_user_video_duration', type: 'time' })
+    @Column({ name: 'an_user_video_duration', type: 'time', nullable: true })
     @IsString()
+    @IsOptional()
     anUserVideoDuration: string;
 
     @ApiProperty({
@@ -90,21 +102,31 @@ export class Analysis extends CoreEntity {
     @ApiProperty({
         description: '사용자 영상 모션 데이터 S3 url',
         type: String,
+        nullable: true,
     })
     @Column({
         name: 'an_user_video_motion_data_url',
         type: 'varchar',
         length: '255',
+        nullable: true,
     })
     @IsUrl()
+    @IsOptional()
     anUserVideoMotionDataURL: string;
 
     @ApiProperty({
         description: '사용자 영상 유사도 분석 데이터 S3 url',
         type: String,
+        nullable: true,
     })
-    @Column({ name: 'an_simularity_url', type: 'varchar', length: 255 })
+    @Column({
+        name: 'an_simularity_url',
+        type: 'varchar',
+        length: 255,
+        nullable: true,
+    })
     @IsUrl()
+    @IsOptional()
     anSimularityURL: string;
 
     @Column({ name: 'an_deleted', type: 'boolean', default: false })
