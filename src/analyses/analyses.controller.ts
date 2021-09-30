@@ -19,11 +19,14 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthJwt } from 'src/auth/auth-jwt.decorator';
+import { AuthMember } from 'src/auth/auth-member.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
+import { Member } from 'src/members/entities/members.entity';
 import { AnalysesService } from './analyses.service';
+import { CreateAnalysisRequestInput } from './dtos/create-analysis-request.dto';
 import {
     CreateAnalysisResultInput,
     CreateAnalysisResultOutput,
@@ -110,9 +113,13 @@ export class AnalysesController {
     @Post()
     @UseGuards(MemberGuard)
     createAnalysisRequest(
-        @Req() req: Request,
+        @AuthMember() member: Member,
+        @Body() createAnalysisRequestInput: CreateAnalysisRequestInput,
     ): Promise<CreateAnalysisResultOutput> {
-        return this.analysesService.createAnalysisRequest(req);
+        return this.analysesService.createAnalysisRequest(
+            member,
+            createAnalysisRequestInput,
+        );
     }
 
     @ApiOperation({
