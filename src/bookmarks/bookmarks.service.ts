@@ -77,10 +77,10 @@ export class BookmarksService {
 
     async checkBookmark(
         authMember: Member,
-        refVideoId: string,
+        rvSeq: string,
     ): Promise<CheckBookmarkOutput> {
         try {
-            const refVideo = await this.refVideos.findOne(refVideoId);
+            const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
                     ok: true,
@@ -89,7 +89,7 @@ export class BookmarksService {
             }
             const isBookmarked = await this.findBookmarkByMbrSeqAndRvSeq(
                 authMember.mbrSeq,
-                refVideoId,
+                rvSeq,
             );
             return {
                 ok: true,

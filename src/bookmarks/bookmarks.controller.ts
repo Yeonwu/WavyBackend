@@ -64,9 +64,9 @@ export class BookmarksController {
     @UseGuards(MemberGuard)
     checkBookmark(
         @AuthMember() authMember: Member,
-        @Param('id') refVideoId: string,
+        @Param('id') rvSeq: string,
     ): Promise<CheckBookmarkOutput> {
-        return this.bookmarksService.checkBookmark(authMember, refVideoId);
+        return this.bookmarksService.checkBookmark(authMember, rvSeq);
     }
 
     @ApiOperation({
