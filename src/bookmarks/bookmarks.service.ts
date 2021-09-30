@@ -79,6 +79,7 @@ export class BookmarksService {
         { rvSeq }: CreateBookmarkInput,
     ): Promise<CreateBookmarkOutput> {
         try {
+            const member = this.members.create(authMember);
             const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
@@ -98,8 +99,8 @@ export class BookmarksService {
                     error: '이미 보관된 영상입니다',
                 };
             }
-            authMember.bookmarkedRefVideos = [refVideo];
-            await this.members.manager.save(authMember);
+            member.bookmarkedRefVideos = [refVideo];
+            await this.members.manager.save(member);
             return {
                 ok: true,
                 bookmarkedRefVideo: refVideo,
