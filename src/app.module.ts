@@ -23,6 +23,9 @@ import { TagsModule } from './tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { AwsModule } from './aws/aws.module';
+import { AwsSdkModule } from 'nest-aws-sdk';
+import { S3, SharedIniFileCredentials } from 'aws-sdk';
 
 @Module({
     imports: [
@@ -47,6 +50,9 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
                 KAKAO_LOGIN_HOST: Joi.string().required(),
                 KAKAO_GRANT_TYPE: Joi.string().required(),
                 BASE_DOMAIN: Joi.string().required(),
+
+                AWS_PROFILE: Joi.string().required(),
+                AWS_PRIVATE_KEY_LOCATION: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({
@@ -69,6 +75,15 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
                 Tag,
             ],
         }),
+        AwsSdkModule.forRoot({
+            defaultServiceOptions: {
+                region: 'ap-northeast-2',
+                credentials: new SharedIniFileCredentials({
+                    profile: process.env.AWS_PROFILE,
+                }),
+            },
+            services: [S3],
+        }),
         MembersModule,
         PracticesModule,
         AnalysesModule,
@@ -77,6 +92,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
         TagsModule,
         AuthModule,
         BookmarksModule,
+        AwsModule,
     ],
     controllers: [],
     providers: [],
