@@ -25,7 +25,8 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AwsModule } from './aws/aws.module';
 import { AwsSdkModule } from 'nest-aws-sdk';
-import { S3, SharedIniFileCredentials } from 'aws-sdk';
+import { S3, S3Control, S3Outposts, SharedIniFileCredentials } from 'aws-sdk';
+import { GetS3SignedUrlInput } from './aws/dtos/get-s3-signed-url.dto';
 
 @Module({
     imports: [
@@ -53,6 +54,7 @@ import { S3, SharedIniFileCredentials } from 'aws-sdk';
 
                 AWS_PROFILE: Joi.string().required(),
                 AWS_PRIVATE_KEY_LOCATION: Joi.string().required(),
+                AWS_UPLOAD_S3_BUCKET: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({
@@ -77,7 +79,7 @@ import { S3, SharedIniFileCredentials } from 'aws-sdk';
         }),
         AwsSdkModule.forRoot({
             defaultServiceOptions: {
-                region: 'ap-northeast-2',
+                region: process.env.AWS_REGOIN,
                 credentials: new SharedIniFileCredentials({
                     profile: process.env.AWS_PROFILE,
                 }),
