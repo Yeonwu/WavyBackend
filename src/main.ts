@@ -40,6 +40,12 @@ async function bootstrap() {
         }),
     );
 
+    app.enableCors({
+        origin: ['http://localhost:3000', 'http://www.wavy.dance'],
+        methods: ['GET', 'POST', 'UPDATE', 'DELETE'],
+        allowedHeaders: ['Authorization'],
+    });
+
     await app.listen(3000);
 }
 bootstrap();
