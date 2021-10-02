@@ -43,7 +43,7 @@ async function bootstrap() {
     app.enableCors({
         origin: ['http://localhost:3000', 'http://www.wavy.dance'],
         methods: ['GET', 'POST', 'UPDATE', 'DELETE'],
-        allowedHeaders: ['Authorization'],
+        allowedHeaders: ['Authorization', 'content-type'],
     });
 
     await app.listen(3000);
