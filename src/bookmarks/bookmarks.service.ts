@@ -6,6 +6,7 @@ import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import { Repository } from 'typeorm';
 import { BookmarksInput, BookmarksOutput } from './dtos/bookmarks.dto';
+import { CheckBookmarkOutput } from './dtos/check-bookmark.dto';
 import {
     CreateBookmarkInput,
     CreateBookmarkOutput,
@@ -74,11 +75,53 @@ export class BookmarksService {
         }
     }
 
+    async checkBookmark(
+        authMember: Member,
+        rvSeq: string,
+    ): Promise<CheckBookmarkOutput> {
+        try {
+            const refVideo = await this.refVideos.findOne(rvSeq);
+            if (!refVideo) {
+                return {
+                    ok: true,
+                    isBookmarked: false,
+                };
+            }
+            const isBookmarked = await this.findBookmarkByMbrSeqAndRvSeq(
+                authMember.mbrSeq,
+                rvSeq,
+            );
+            return {
+                ok: true,
+                isBookmarked: isBookmarked,
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                error: '북마크 여부를 조회 할 수 없습니다',
+            };
+        }
+    }
+
+    async findBookmarkByMbrSeqAndRvSeq(
+        mbrSeq: string,
+        rvSeq: string,
+    ): Promise<boolean> {
+        const sql = `
+                SELECT COUNT(*) FROM bookmarks
+                WHERE mbr_seq = ${mbrSeq} AND rv_seq = ${rvSeq}
+            `;
+        const sqlRawResults = await this.members.query(sql);
+        const { count } = sqlRawResults[0];
+        return count > 0 ? true : false;
+    }
+
     async createBookmark(
         authMember: Member,
         { rvSeq }: CreateBookmarkInput,
     ): Promise<CreateBookmarkOutput> {
         try {
+            const member = this.members.create(authMember);
             const refVideo = await this.refVideos.findOne(rvSeq);
             if (!refVideo) {
                 return {
@@ -86,20 +129,18 @@ export class BookmarksService {
                     error: '존재하지 않는 학습용 동영상입니다',
                 };
             }
-            const sql = `
-                SELECT COUNT(*) FROM bookmarks
-                WHERE mbr_seq = ${authMember.mbrSeq} AND rv_seq = ${rvSeq}
-            `;
-            const sqlRawResults = await this.members.query(sql);
-            const { count } = sqlRawResults[0];
-            if (count > 0) {
+            const isBookmarked = await this.findBookmarkByMbrSeqAndRvSeq(
+                authMember.mbrSeq,
+                rvSeq,
+            );
+            if (isBookmarked) {
                 return {
                     ok: false,
                     error: '이미 보관된 영상입니다',
                 };
             }
-            authMember.bookmarkedRefVideos = [refVideo];
-            await this.members.manager.save(authMember);
+            member.bookmarkedRefVideos = [refVideo];
+            await this.members.manager.save(member);
             return {
                 ok: true,
                 bookmarkedRefVideo: refVideo,
