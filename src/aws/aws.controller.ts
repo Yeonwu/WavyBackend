@@ -11,6 +11,7 @@ import { Member } from 'src/members/entities/members.entity';
 import { AwsService } from './aws.service';
 import { GetS3SignedUrlInput } from './dtos/get-s3-signed-url.dto';
 
+@ApiTags('분석')
 @Controller('aws')
 export class AwsController {
     constructor(private readonly awsService: AwsService) {}
@@ -20,7 +21,6 @@ export class AwsController {
         description:
             '사용자 비디오를 저장한 S3 객체에 접근할 수 있는 URL을 받아옵니다.',
     })
-    @ApiTags('인증')
     @ApiBearerAuth('access-token')
     @Get('s3-download-signed-url')
     @UseGuards(MemberGuard)
@@ -32,5 +32,16 @@ export class AwsController {
             authMember,
             getS3SignedUrlInput,
         );
+    }
+
+    @ApiOperation({
+        summary: 'S3 업로드 URL 받아오기 ',
+        description: '비디오를 업로드 할 수 있는 S3 URL을 받아옵니다.',
+    })
+    @ApiBearerAuth('access-token')
+    @Get('s3-upload-signed-url')
+    @UseGuards(MemberGuard)
+    getS3UploadSignedUrl() {
+        return this.awsService.getS3UploadSignedUrl();
     }
 }

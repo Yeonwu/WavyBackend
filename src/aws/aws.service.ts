@@ -29,6 +29,29 @@ export class AwsService {
         return true;
     }
 
+    async getS3UploadSignedUrl() {
+        try {
+            const bucket = this.config.get('AWS_UPLOAD_S3_BUCKET');
+            const s3Object = this.generateS3ObjectName();
+
+            const params = {
+                Bucket: bucket,
+                Key: `${s3Object}.webm`,
+                Expires: 3600,
+                ContentType: 'webm',
+                ACL: 'public-read',
+            };
+            const signedUrl = await this.s3.getSignedUrlPromise(
+                'putObject',
+                params,
+            );
+            return { ok: true, signedUrl };
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return { ok: false, error: '업로드 URL을 받아오지 못했습니다.' };
+        }
+    }
+
     async getS3DownloadSignedUrl(
         authMember: Member,
         params: GetS3SignedUrlInput,
