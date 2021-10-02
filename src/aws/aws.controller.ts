@@ -44,4 +44,24 @@ export class AwsController {
     getS3UploadSignedUrl() {
         return this.awsService.getS3UploadSignedUrl();
     }
+
+    @Get('test')
+    getTest() {
+        return `
+        <form>
+            <input name="file" , type="file" />
+        </form>
+
+        <script>
+            function gogo(signedUrl) {
+                let xhr = new XMLHttpRequest();
+                xhr.open('PUT', signedUrl);
+                let form = document.querySelector('form');
+                let formData = new FormData(form);
+                xhr.send(formData);
+                console.log(xhr.response);
+            }
+        </script>
+        `;
+    }
 }
