@@ -50,7 +50,11 @@ export class AuthController {
             console.log(`${state} / ${error}: ${error_description}`);
             return { ok: false, error: '카카오 로그인에 실패했습니다.' };
         }
+        return { ok: true };
+    }
 
+    @Get('token')
+    getJwtToken(@Query() { code }: KakaoRedirectInput) {
         return this.authService.getJwt(code);
     }
 

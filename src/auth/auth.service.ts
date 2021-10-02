@@ -56,7 +56,7 @@ export class AuthService {
 
             return { ok: true, token: jwtToken };
         } catch (error) {
-            console.log(error);
+            console.log(error.stack, error.message);
             return {
                 ok: false,
                 error: '회원 인증에 실패했습니다',
@@ -115,7 +115,7 @@ export class AuthService {
             return kakaoTokens;
         } catch (error) {
             error.message += `\n 
-            error args at getKakaoAccessToken \n
+            error args at getKakaoToken \n
             code: ${code}
             `;
             throw error;
