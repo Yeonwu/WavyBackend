@@ -81,7 +81,11 @@ export class AwsService {
             return { ok: true, signedUrl: s3UploadSignedUrl };
         } catch (error) {
             console.log(error.stack, error.message);
-            return { ok: false, error: '업로드 URL을 받아오지 못했습니다.' };
+            return { ok: false, error: '다운로드 URL을 받아오지 못했습니다.' };
         }
+    }
+
+    private async generateS3ObjectName(): Promise<string> {
+        return '';
     }
 }
