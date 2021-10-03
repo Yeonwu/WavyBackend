@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
 import { MemberCertificationMethodCode } from 'src/common/enums/code.enum';
@@ -165,11 +164,18 @@ export class MembersService {
         }
     }
 
-    private async deleteMemberPrivateInfo(member) {
+    private async deleteMemberPrivateInfo(member: Member) {
         member.mbrEmail = '_';
         member.mbrNickname = '_';
         member.profileImageUrl = '_';
         member.mbrDeleted = true;
+
+        switch (member.certificationMethodCode) {
+            case MemberCertificationMethodCode.KAKAO:
+                member.mbrKakaoSeq = '0';
+            default:
+                member.mbrKakaoSeq = '0';
+        }
 
         await this.members.save(member);
     }
@@ -185,7 +191,9 @@ export class MembersService {
                 return getMemberResult;
             }
 
-            await this.deleteMemberPrivateInfo(getMemberResult.member);
+            await this.deleteMemberPrivateInfo(
+                getMemberResult.member as Member,
+            );
 
             if (options?.purge) {
                 /**
