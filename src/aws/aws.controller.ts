@@ -17,7 +17,7 @@ import {
 import { GetS3UploadSignedUrlOutput } from './dtos/get-s3-upload-signed-url.dto';
 
 @ApiTags('분석')
-@Controller('aws')
+@Controller()
 export class AwsController {
     constructor(private readonly awsService: AwsService) {}
 
@@ -31,7 +31,7 @@ export class AwsController {
         description: '정상적으로 URL을 받아왔습니다.',
         type: GetS3DownloadSignedUrlOutput,
     })
-    @Get('s3-download-signed-url')
+    @Get('analysis/s3-download-signed-url')
     @UseGuards(MemberGuard)
     getS3DownloadSignedUrl(
         @AuthMember() authMember: Member,
@@ -52,7 +52,7 @@ export class AwsController {
         description: '정상적으로 URL을 받아왔습니다.',
         type: GetS3UploadSignedUrlOutput,
     })
-    @Get('s3-upload-signed-url')
+    @Get('analysis/s3-upload-signed-url')
     @UseGuards(MemberGuard)
     getS3UploadSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
         return this.awsService.getS3UploadSignedUrl();
