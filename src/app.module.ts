@@ -47,6 +47,10 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
                 KAKAO_LOGIN_HOST: Joi.string().required(),
                 KAKAO_GRANT_TYPE: Joi.string().required(),
                 BASE_DOMAIN: Joi.string().required(),
+
+                CORS_ORIGINS: Joi.string().required(),
+                CORS_HEADERS: Joi.string().required(),
+                CORS_METHODS: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({
