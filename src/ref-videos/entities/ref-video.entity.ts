@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsEnum,
-    IsNumber,
     IsNumberString,
     IsOptional,
     IsString,
@@ -98,6 +97,20 @@ export class RefVideo extends CoreEntity {
     @IsString()
     @IsOptional()
     rvArtistName?: string;
+
+    @ApiPropertyOptional({
+        type: String,
+        description: '학습용 동영상에서 추출한 포즈 데이터 URL',
+    })
+    @Column({
+        name: 'rv_pose_data_url',
+        nullable: true,
+        type: 'varchar',
+        length: 255,
+    })
+    @IsString()
+    @IsOptional()
+    rvPoseDataUrl?: string;
 
     @OneToMany((type) => Analysis, (analysis) => analysis.refVideo)
     analyses: Analysis[];
