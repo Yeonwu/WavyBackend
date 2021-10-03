@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { AwsService } from 'src/aws/aws.service';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
+import { MembersService } from 'src/members/members.service';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import { RefVideosService } from 'src/ref-videos/ref-videos.service';
 import { Brackets, DeepPartial, Repository } from 'typeorm';
@@ -32,6 +34,7 @@ export class AnalysesService {
         @InjectRepository(Analysis)
         private readonly analyses: Repository<Analysis>,
         private readonly refVideos: RefVideosService,
+        private readonly awsService: AwsService,
     ) {}
 
     async getAnalyses(
@@ -266,20 +269,12 @@ export class AnalysesService {
         }
         const refVideoUrl = refVideo.rvUrl;
 
-        await this.callAutoMotionWorkerApi(anSeq, anUserVideoURL, refVideoUrl);
+        await this.awsService.callAutoMotionWorkerApi(
+            anSeq,
+            anUserVideoURL,
+            refVideoUrl,
+        );
         return { ok: true };
-    }
-
-    private async callAutoMotionWorkerApi(
-        anSeq: string,
-        userVideoUrl: string,
-        refVideoUrl: string,
-    ) {
-        /**
-         * TODO
-         * 인공지능 돌리는 EC2에 분석 요청
-         */
-        return true;
     }
 
     private async buildAnalysis(

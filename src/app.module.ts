@@ -25,8 +25,7 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AwsModule } from './aws/aws.module';
 import { AwsSdkModule } from 'nest-aws-sdk';
-import { S3, S3Control, S3Outposts, SharedIniFileCredentials } from 'aws-sdk';
-import { GetS3SignedUrlInput } from './aws/dtos/get-s3-signed-url.dto';
+import { S3, SharedIniFileCredentials } from 'aws-sdk';
 
 @Module({
     imports: [

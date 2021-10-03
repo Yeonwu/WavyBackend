@@ -4,10 +4,14 @@ import { InjectAwsService } from 'nest-aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import * as cf from 'aws-cloudfront-sign';
 import { Member } from 'src/members/entities/members.entity';
-import { GetS3SignedUrlInput } from './dtos/get-s3-signed-url.dto';
+import {
+    GetS3DownloadSignedUrlInput,
+    GetS3DownloadSignedUrlOutput,
+} from './dtos/get-s3-download-signed-url.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { Repository } from 'typeorm';
+import { GetS3UploadSignedUrlOutput } from './dtos/get-s3-upload-signed-url.dto';
 
 @Injectable()
 export class AwsService {
@@ -29,23 +33,25 @@ export class AwsService {
         return true;
     }
 
-    async getS3UploadSignedUrl() {
+    async getS3UploadSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
         try {
             const bucket = this.config.get('AWS_UPLOAD_S3_BUCKET');
-            const s3Object = this.generateS3ObjectName();
+            const s3ObjectName = await this.generateS3ObjectName();
+            const videoFormat = 'webm';
 
             const params = {
                 Bucket: bucket,
-                Key: `${s3Object}.webm`,
+                Key: `${s3ObjectName}.${videoFormat}`,
                 Expires: 3600,
-                ContentType: 'webm',
+                ContentType: videoFormat,
                 ACL: 'public-read',
             };
+
             const signedUrl = await this.s3.getSignedUrlPromise(
                 'putObject',
                 params,
             );
-            return { ok: true, signedUrl };
+            return { ok: true, signedUrl, s3ObjectName };
         } catch (error) {
             console.log(error.stack, error.message);
             return { ok: false, error: '업로드 URL을 받아오지 못했습니다.' };
@@ -54,8 +60,8 @@ export class AwsService {
 
     async getS3DownloadSignedUrl(
         authMember: Member,
-        params: GetS3SignedUrlInput,
-    ) {
+        params: GetS3DownloadSignedUrlInput,
+    ): Promise<GetS3DownloadSignedUrlOutput> {
         try {
             const { anSeq } = params;
             const { mbrSeq } = authMember;
@@ -63,7 +69,7 @@ export class AwsService {
             const analysis = await this.analysisRepo.findOne({ anSeq });
 
             const isMemberOwner = analysis.mbrSeq == mbrSeq;
-            if (!(analysis && isMemberOwner)) {
+            if (!analysis || !isMemberOwner) {
                 return { ok: false, error: '해당하는 비디오가 없습니다.' };
             }
 
@@ -80,12 +86,40 @@ export class AwsService {
             );
             return { ok: true, signedUrl: s3UploadSignedUrl };
         } catch (error) {
-            console.log(error.stack, error.message);
+            console.log(error.message);
             return { ok: false, error: '다운로드 URL을 받아오지 못했습니다.' };
         }
     }
 
     private async generateS3ObjectName(): Promise<string> {
-        return '';
+        let possibleName;
+        let isS3ObjectExists;
+
+        do {
+            possibleName = this.randomName();
+            isS3ObjectExists = await this.isS3ObjectExists(possibleName);
+        } while (isS3ObjectExists);
+
+        return possibleName;
+    }
+
+    private async isS3ObjectExists(name: string): Promise<boolean> {
+        try {
+            const data = await this.s3
+                .headObject({
+                    Bucket: 'wavy-test',
+                    Key: name,
+                })
+                .promise();
+            return data ? false : true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    private randomName(): string {
+        return `user-video-${new Date().toISOString()}-${Math.floor(
+            Math.random() * 1000,
+        )}`.replace(/:/g, '-');
     }
 }

@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import {
     ApiBearerAuth,
+    ApiOkResponse,
     ApiOperation,
     ApiQuery,
     ApiTags,
@@ -9,7 +10,11 @@ import { AuthMember } from 'src/auth/auth-member.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { Member } from 'src/members/entities/members.entity';
 import { AwsService } from './aws.service';
-import { GetS3SignedUrlInput } from './dtos/get-s3-signed-url.dto';
+import {
+    GetS3DownloadSignedUrlInput,
+    GetS3DownloadSignedUrlOutput,
+} from './dtos/get-s3-download-signed-url.dto';
+import { GetS3UploadSignedUrlOutput } from './dtos/get-s3-upload-signed-url.dto';
 
 @ApiTags('분석')
 @Controller('aws')
@@ -22,12 +27,16 @@ export class AwsController {
             '사용자 비디오를 저장한 S3 객체에 접근할 수 있는 URL을 받아옵니다.',
     })
     @ApiBearerAuth('access-token')
+    @ApiOkResponse({
+        description: '정상적으로 URL을 받아왔습니다.',
+        type: GetS3DownloadSignedUrlOutput,
+    })
     @Get('s3-download-signed-url')
     @UseGuards(MemberGuard)
     getS3DownloadSignedUrl(
         @AuthMember() authMember: Member,
-        @Query() getS3SignedUrlInput: GetS3SignedUrlInput,
-    ) {
+        @Query() getS3SignedUrlInput: GetS3DownloadSignedUrlInput,
+    ): Promise<GetS3DownloadSignedUrlOutput> {
         return this.awsService.getS3DownloadSignedUrl(
             authMember,
             getS3SignedUrlInput,
@@ -39,9 +48,13 @@ export class AwsController {
         description: '비디오를 업로드 할 수 있는 S3 URL을 받아옵니다.',
     })
     @ApiBearerAuth('access-token')
+    @ApiOkResponse({
+        description: '정상적으로 URL을 받아왔습니다.',
+        type: GetS3UploadSignedUrlOutput,
+    })
     @Get('s3-upload-signed-url')
     @UseGuards(MemberGuard)
-    getS3UploadSignedUrl() {
+    getS3UploadSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
         return this.awsService.getS3UploadSignedUrl();
     }
 
