@@ -1,5 +1,14 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+} from '@nestjs/swagger';
+import {
+    CreateRefVideoInput,
+    CreateRefVideoOutput,
+} from './dtos/create-ref-video.dto';
 import { RefVideoOutput } from './dtos/ref-video.dto';
 import { RefVideosInput, RefVideosOutput } from './dtos/ref-videos.dto';
 import {
@@ -25,6 +34,21 @@ export class RefVideosController {
         @Query() refVideosInput: RefVideosInput,
     ): Promise<RefVideosOutput> {
         return this.refVideosService.allRefVideos(refVideosInput);
+    }
+
+    @ApiOperation({
+        summary: '학습용 영상 등록',
+        description: '학습용 영상을 등록하고 결과를 반환한다',
+    })
+    @ApiCreatedResponse({
+        description: '학습용 영상을 등록하고 결과를 반환한다',
+        type: CreateRefVideoOutput,
+    })
+    @Post()
+    postRefVideo(
+        @Body() createRefVideoInput: CreateRefVideoInput,
+    ): Promise<CreateRefVideoOutput> {
+        return this.refVideosService.createRefVideo(createRefVideoInput);
     }
 
     @ApiOperation({

@@ -10,12 +10,19 @@ import {
     SearchRefVideosInput,
     SearchRefVideosOutput,
 } from './dtos/search-ref-videos.dto';
+import {
+    CreateRefVideoInput,
+    CreateRefVideoOutput,
+} from './dtos/create-ref-video.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RefVideosService {
     constructor(
         @InjectRepository(RefVideo)
         private readonly refVideos: Repository<RefVideo>,
+
+        private readonly configService: ConfigService,
     ) {}
 
     async allRefVideos({
@@ -90,6 +97,58 @@ export class RefVideosService {
             return {
                 ok: false,
                 error: '학습용 동영상을 찾을 수 없습니다',
+            };
+        }
+    }
+
+    async checkRefVideo(
+        rvSourceTitle: string,
+        rvSourceAccountName: string,
+    ): Promise<boolean> {
+        const [_, totalResults] = await this.refVideos.findAndCount({
+            where: {
+                rvSourceTitle: Raw(
+                    (title) => `${title} ILIKE '%${rvSourceTitle}%'`,
+                ),
+                rvSourceAccountName: Raw(
+                    (accountName) =>
+                        `${accountName} ILIKE '%${rvSourceAccountName}%'`,
+                ),
+            },
+        });
+        if (totalResults > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    async createRefVideo(
+        createRefVideoInput: CreateRefVideoInput,
+    ): Promise<CreateRefVideoOutput> {
+        try {
+            const isRegistered = await this.checkRefVideo(
+                createRefVideoInput.rvSourceTitle,
+                createRefVideoInput.rvSourceAccountName,
+            );
+            if (isRegistered) {
+                return {
+                    ok: false,
+                    error: '이미 등록된 학습용 동영상입니다',
+                };
+            }
+            const newRefVideo = this.refVideos.create(createRefVideoInput);
+            const systemMbrSeq = this.configService.get('SYSTEM_MBR_SEQ');
+            newRefVideo.creatorSeq = systemMbrSeq;
+            newRefVideo.updaterSeq = systemMbrSeq;
+            await this.refVideos.save(newRefVideo);
+            return {
+                ok: true,
+                refVideo: newRefVideo,
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                error: '학습용 동영상을 등록할 수 없습니다',
             };
         }
     }
