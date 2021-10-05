@@ -1,11 +1,15 @@
+import { PickType } from '@nestjs/swagger';
 import { IsJWT, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { KakaoRedirectInput } from './kakao-redirect.dto';
 
 export class GetJwtOutput extends CoreOutput {
     @IsJWT()
     @IsOptional()
     token?: string;
 }
+
+export class GetJwtInput extends PickType(KakaoRedirectInput, ['code']) {}
 
 export class UnlinkTokenOutput extends CoreOutput {}
 
