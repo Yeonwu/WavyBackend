@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
     ApiExcludeEndpoint,
     ApiOkResponse,
@@ -13,7 +14,11 @@ import { AccessTokenGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthJwtDecoded } from './dtos/auth-jwt-core';
 import { GetKakoLoginUrlOutput } from './dtos/get-kakak-login-url.dto';
-import { UnlinkTokenOutput } from './dtos/get-token.dto';
+import {
+    GetJwtInput,
+    GetJwtOutput,
+    UnlinkTokenOutput,
+} from './dtos/get-token.dto';
 import { KakaoRedirectInput } from './dtos/kakao-redirect.dto';
 
 @ApiTags('인증')
@@ -50,7 +55,24 @@ export class AuthController {
             console.log(`${state} / ${error}: ${error_description}`);
             return { ok: false, error: '카카오 로그인에 실패했습니다.' };
         }
+        return { ok: true };
+    }
 
+    @ApiOperation({
+        summary: '인증 가능한 토큰을 발급',
+        description:
+            '/auth/kakaoLoginRedirect에서 url로 받은 토큰을 가지고 본 API로 요청시 인증 가능한 토큰을 발급받을 수 있음.',
+    })
+    @ApiOkResponse({
+        description: '토큰 정상 발급',
+        type: GetJwtOutput,
+    })
+    @ApiBadRequestResponse({
+        description: '토큰 발급 실패 ',
+        type: GetJwtOutput,
+    })
+    @Get('token')
+    getJwtToken(@Query() { code }: GetJwtInput): Promise<GetJwtOutput> {
         return this.authService.getJwt(code);
     }
 
