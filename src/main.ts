@@ -6,6 +6,24 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    const corsOrigins: Array<string> = process.env.CORS_ORIGINS.split(' ');
+    const corsHeaders: Array<string> = process.env.CORS_HEADERS.split(' ');
+    const corsMethods: Array<string> = process.env.CORS_METHODS.split(' ');
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+        }),
+    );
+
+    app.enableCors({
+        origin: corsOrigins,
+        methods: corsMethods,
+        allowedHeaders: corsHeaders,
+    });
+
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Wavy API')
         .setDescription(
@@ -31,14 +49,6 @@ async function bootstrap() {
 
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api/docs', app, swaggerDocument);
-
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            forbidNonWhitelisted: true,
-            transform: true,
-        }),
-    );
 
     await app.listen(3000);
 }
