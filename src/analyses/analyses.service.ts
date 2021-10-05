@@ -1,11 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { AwsService } from 'src/aws/aws.service';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { Member } from 'src/members/entities/members.entity';
+import { MembersService } from 'src/members/members.service';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
-import { Brackets, Repository } from 'typeorm';
+import { RefVideosService } from 'src/ref-videos/ref-videos.service';
+import { Brackets, DeepPartial, Repository } from 'typeorm';
+import {
+    CreateAnalysisRequestInput,
+    RegisterAnalysisInQueueInput,
+} from './dtos/create-analysis-request.dto';
 import {
     CreateAnalysisResultInput,
     CreateAnalysisResultOutput,
@@ -26,6 +33,8 @@ export class AnalysesService {
     constructor(
         @InjectRepository(Analysis)
         private readonly analyses: Repository<Analysis>,
+        private readonly refVideos: RefVideosService,
+        private readonly awsService: AwsService,
     ) {}
 
     async getAnalyses(
@@ -37,6 +46,7 @@ export class AnalysesService {
                 .createQueryBuilder('an')
                 .leftJoinAndSelect('an.refVideo', 'rv')
                 .select([
+                    'an.createdDate',
                     'an.anSeq',
                     'an.anScore',
                     'an.anScore',
@@ -99,7 +109,6 @@ export class AnalysesService {
                 .leftJoinAndSelect('an.refVideo', 'rv')
                 .select([
                     'an.anSeq',
-                    'an.anScore',
                     'an.anScore',
                     'an.anGradeCode',
                     'an.anUserVideoURL',
@@ -223,17 +232,53 @@ export class AnalysesService {
         }
     }
 
-    async createAnalysisRequest(req: Request) {
-        /***
-         * TODO
-         * - 영상 s3에 업로드(스트리밍?)
-         * - 인공지능 돌리는 EC2에 분석 요청
-         */
+    async createAnalysisRequest(
+        member: Member,
+        createAnalysisRequestInput: CreateAnalysisRequestInput,
+    ) {
+        try {
+            const { anUserVideoURL } = createAnalysisRequestInput;
+            const newAnalysis: Analysis = await this.buildAnalysis(
+                createAnalysisRequestInput,
+                member.mbrSeq,
+            );
+            const savedAnalysis: Analysis = await this.analyses.save(
+                newAnalysis,
+            );
+
+            await this.registerAnalysisInQueue({
+                anSeq: savedAnalysis.anSeq,
+                anUserVideoURL,
+                rvSeq: savedAnalysis.rvSeq,
+            });
+
+            return { ok: true, savedAnalysis };
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return { ok: false, error: '분석 요청에 실패했습니다.' };
+        }
+    }
+
+    private async registerAnalysisInQueue(
+        registerAnalysisInQueueInput: RegisterAnalysisInQueueInput,
+    ) {
+        const { anSeq, rvSeq, anUserVideoURL } = registerAnalysisInQueueInput;
+        const { ok, refVideo } = await this.refVideos.findRefVideoById(rvSeq);
+        if (!ok) {
+            throw new Error(`Cannot Find refVideo with rvSeq(${rvSeq})`);
+        }
+        const refVideoUrl = refVideo.rvUrl;
+
+        await this.awsService.callAutoMotionWorkerApi(
+            anSeq,
+            anUserVideoURL,
+            refVideoUrl,
+        );
         return { ok: true };
     }
 
     private async buildAnalysis(
-        analysis: CreateAnalysisResultInput,
+        analysis: DeepPartial<Analysis>,
         mbrSeq: string,
     ): Promise<Analysis> {
         const newAnalysis = this.analyses.create(analysis);

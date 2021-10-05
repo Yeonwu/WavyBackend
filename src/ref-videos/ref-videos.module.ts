@@ -8,5 +8,6 @@ import { RefVideosService } from './ref-videos.service';
     imports: [TypeOrmModule.forFeature([RefVideo])],
     controllers: [RefVideosController],
     providers: [RefVideosService],
+    exports: [RefVideosService],
 })
 export class RefVideosModule {}
