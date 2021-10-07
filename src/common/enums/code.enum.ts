@@ -56,3 +56,10 @@ export enum MemberExpHistoryTierCode {
     C = '90004',
     D = '90005',
 }
+
+export enum AnalysisStatusCode {
+    START = '120001',
+    PROCESSING = '120002',
+    SUCCESS = '120003',
+    FAIL = '120004',
+}
