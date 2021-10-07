@@ -46,7 +46,6 @@ export class AwsController {
     @ApiOperation({
         summary: 'S3 업로드 URL 받아오기 ',
         description: `비디오를 업로드 할 수 있는 S3 URL과 파일명을 받아옵니다.\n
-        파일명은 확장자가 포함되어 있지 않습니다.\n
         업로드시 파일명, 확장자는 상관없이 올려주셔도 괜찮습니다. 자동으로 변경됩니다.\n
         업로드가 성공적으로 완료될 경우 200 OK로 응답이 옵니다.\n
         업로드가 완료된 다음 분석요청 API를 호출해주세요.\n

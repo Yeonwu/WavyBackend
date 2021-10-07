@@ -122,7 +122,8 @@ export class AnalysesController {
 
     @ApiOperation({
         summary: '영상 분석결과 등록',
-        description: '영상 분석 결과를 DB에 등록하는 API입니다.',
+        description: `영상 분석 결과를 DB에 등록하는 API입니다.\n
+        클라이언트에서 호출하지 않고 머신러닝 인스턴스에서 호출하는 API입니다.`,
     })
     @ApiCreatedResponse({
         description:
