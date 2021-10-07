@@ -132,4 +132,16 @@ export class Analysis extends CoreEntity {
     @Column({ name: 'an_deleted', type: 'boolean', default: false })
     @IsBoolean()
     anDeleted: boolean;
+
+    @ApiProperty({
+        description: '분석 진행 상황 코드',
+        enum: AnalysisStatusCode,
+    })
+    @Column({
+        name: 'an_status_cd',
+        type: 'varchar',
+        length: 50,
+    })
+    @IsEnum(AnalysisStatusCode)
+    anStatusCode: AnalysisStatusCode;
 }
