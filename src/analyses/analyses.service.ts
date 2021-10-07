@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { AwsService } from 'src/aws/aws.service';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
+import { AnalysisStatusCode } from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
-import { MembersService } from 'src/members/members.service';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
+
 import { RefVideosService } from 'src/ref-videos/ref-videos.service';
-import { Brackets, DeepPartial, Repository } from 'typeorm';
-import {
-    CreateAnalysisRequestInput,
-    RegisterAnalysisInQueueInput,
-} from './dtos/create-analysis-request.dto';
+import { Brackets, Repository } from 'typeorm';
+import { CreateAnalysisRequestInput } from './dtos/create-analysis-request.dto';
 import {
     CreateAnalysisResultInput,
     CreateAnalysisResultOutput,
@@ -51,7 +48,7 @@ export class AnalysesService {
                     'an.anScore',
                     'an.anScore',
                     'an.anGradeCode',
-                    'an.anUserVideoURL',
+                    'an.anUserVideoFilename',
                     'rv.rvSeq',
                     'rv.rvSource',
                     'rv.rvSourceTitle',
@@ -111,7 +108,7 @@ export class AnalysesService {
                     'an.anSeq',
                     'an.anScore',
                     'an.anGradeCode',
-                    'an.anUserVideoURL',
+                    'an.anUserVideoFilename',
                     'rv.rvSeq',
                     'rv.rvSource',
                     'rv.rvSourceTitle',
@@ -219,7 +216,23 @@ export class AnalysesService {
         analysisInput: CreateAnalysisResultInput,
     ): Promise<CreateAnalysisResultOutput> {
         try {
-            const newAnalysis = await this.buildAnalysis(analysisInput, mbrSeq);
+            const newAnalysis = await this.analyses.findOne({
+                anSeq: analysisInput.anSeq,
+            });
+
+            if (!newAnalysis) {
+                throw new Error('Cannot get analysis');
+            }
+
+            newAnalysis.anSimularityFilename =
+                analysisInput.anSimularityFilename;
+            newAnalysis.anUserVideoMotionDataFilename =
+                analysisInput.anUserVideoMotionDataFilename;
+            newAnalysis.anScore = analysisInput.anScore;
+            newAnalysis.anGradeCode = analysisInput.anGradeCode;
+
+            newAnalysis.updaterSeq = mbrSeq;
+
             const savedAnalysis = await this.analyses.save(newAnalysis);
 
             return { ok: true, analysis: savedAnalysis };
@@ -237,20 +250,46 @@ export class AnalysesService {
         createAnalysisRequestInput: CreateAnalysisRequestInput,
     ) {
         try {
-            const { anUserVideoURL } = createAnalysisRequestInput;
-            const newAnalysis: Analysis = await this.buildAnalysis(
-                createAnalysisRequestInput,
-                member.mbrSeq,
+            const { rvSeq, anUserVideoFilename, mirrorEffect } =
+                createAnalysisRequestInput;
+            const newAnalysis = await this.analyses.create({
+                rvSeq,
+                anUserVideoFilename,
+            });
+
+            const { refVideo, ok } = await this.refVideos.findRefVideoById(
+                rvSeq,
             );
+            if (!ok) {
+                throw new Error('Cannot find ref video');
+            }
+            newAnalysis.refVideo = refVideo;
+            newAnalysis.anUserVideoDuration = refVideo.rvDuration;
+
+            newAnalysis.anStatusCode = AnalysisStatusCode.START;
+
+            newAnalysis.member = member;
+            newAnalysis.creatorSeq = member.mbrSeq;
+            newAnalysis.updaterSeq = member.mbrSeq;
+
             const savedAnalysis: Analysis = await this.analyses.save(
                 newAnalysis,
             );
 
-            await this.registerAnalysisInQueue({
-                anSeq: savedAnalysis.anSeq,
-                anUserVideoURL,
-                rvSeq: savedAnalysis.rvSeq,
-            });
+            const response = await this.registerAnalysisInQueue(
+                savedAnalysis,
+                refVideo,
+                mirrorEffect,
+            );
+
+            if (response) {
+                newAnalysis.anStatusCode = AnalysisStatusCode.PROCESSING;
+                await this.analyses.save(newAnalysis);
+            } else {
+                newAnalysis.anStatusCode = AnalysisStatusCode.FAIL;
+                await this.analyses.save(newAnalysis);
+                return { ok: false, error: '분석 요청에 실패했습니다.' };
+            }
 
             return { ok: true, savedAnalysis };
         } catch (error) {
@@ -260,38 +299,24 @@ export class AnalysesService {
     }
 
     private async registerAnalysisInQueue(
-        registerAnalysisInQueueInput: RegisterAnalysisInQueueInput,
-    ) {
-        const { anSeq, rvSeq, anUserVideoURL } = registerAnalysisInQueueInput;
-        const { ok, refVideo } = await this.refVideos.findRefVideoById(rvSeq);
-        if (!ok) {
-            throw new Error(`Cannot Find refVideo with rvSeq(${rvSeq})`);
+        analysis: Analysis,
+        refVideo: RefVideo,
+        mirrorEffect: boolean,
+    ): Promise<boolean> {
+        try {
+            const newUserVideoFileName = await this.awsService.convertWebmToMp4(
+                analysis.anUserVideoFilename,
+                mirrorEffect,
+            );
+
+            analysis.anUserVideoFilename = newUserVideoFileName;
+            this.analyses.save(analysis);
+
+            await this.awsService.callAutoMotionWorkerApi(analysis, refVideo);
+            return true;
+        } catch (error) {
+            console.log(error.stack);
+            return false;
         }
-        const refVideoUrl = refVideo.rvUrl;
-
-        await this.awsService.callAutoMotionWorkerApi(
-            anSeq,
-            anUserVideoURL,
-            refVideoUrl,
-        );
-        return { ok: true };
-    }
-
-    private async buildAnalysis(
-        analysis: DeepPartial<Analysis>,
-        mbrSeq: string,
-    ): Promise<Analysis> {
-        const newAnalysis = this.analyses.create(analysis);
-
-        newAnalysis.member = new Member();
-        newAnalysis.member.mbrSeq = mbrSeq;
-
-        newAnalysis.refVideo = new RefVideo();
-        newAnalysis.refVideo.rvSeq = analysis.rvSeq;
-
-        newAnalysis.creatorSeq = mbrSeq;
-        newAnalysis.updaterSeq = mbrSeq;
-
-        return newAnalysis;
     }
 }
