@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { Repository } from 'typeorm';
 import { GetS3UploadSignedUrlOutput } from './dtos/get-s3-upload-signed-url.dto';
+import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 
 @Injectable()
 export class AwsService {
@@ -21,16 +22,29 @@ export class AwsService {
         @InjectRepository(Analysis)
         private readonly analysisRepo: Repository<Analysis>,
     ) {}
-    async callAutoMotionWorkerApi(
-        anSeq: string,
-        userVideoUrl: string,
-        refVideoUrl: string,
-    ) {
+
+    async callAutoMotionWorkerApi(analysis: Analysis, refVideo: RefVideo) {
         /**
          * TODO
          * 인공지능 돌리는 EC2에 분석 요청
          */
         return true;
+    }
+
+    async convertWebmToMp4(
+        s3ObjectKey: string,
+        mirrorEffect: boolean,
+    ): Promise<string> {
+        // TODO
+        // Call convert lambda api
+        // const sourceBucket = this.config.get('AWS_USER_VIDEO_SOURCE_BUCKET');
+        // const destinationBucket = this.config.get(
+        //     'AWS_USER_VIDEO_DESTINATION_BUCKET',
+        // );
+
+        // const apiGateEndPoint = this.config.get('AWS_API_GATEWAY_ENDPOINT');
+
+        return s3ObjectKey.split('.')[0] + '.mp4';
     }
 
     async getS3UploadSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
@@ -41,7 +55,7 @@ export class AwsService {
 
             const params = {
                 Bucket: bucket,
-                Key: `${s3ObjectName}.${videoFormat}`,
+                Key: `${s3ObjectName}`,
                 Expires: 3600,
                 ContentType: videoFormat,
                 ACL: 'public-read',
@@ -73,7 +87,7 @@ export class AwsService {
                 return { ok: false, error: '해당하는 비디오가 없습니다.' };
             }
 
-            const s3ObjectName = analysis.anUserVideoURL;
+            const s3ObjectName = analysis.anUserVideoFilename;
             const cfUrl = this.config.get('AWS_CLOUDFRONT_ENDPOINT');
             const keypairId = 'K2EDJ5BBPQ7ZL3';
             const s3UploadSignedUrl = cf.getSignedUrl(
@@ -100,7 +114,7 @@ export class AwsService {
             isS3ObjectExists = await this.isS3ObjectExists(possibleName);
         } while (isS3ObjectExists);
 
-        return possibleName;
+        return `${possibleName}`;
     }
 
     private async isS3ObjectExists(name: string): Promise<boolean> {
@@ -120,6 +134,6 @@ export class AwsService {
     private randomName(): string {
         return `user-video-${new Date().toISOString()}-${Math.floor(
             Math.random() * 1000,
-        )}`.replace(/:/g, '-');
+        )}.webm`.replace(/:/g, '-');
     }
 }
