@@ -71,7 +71,7 @@ export class RefVideo extends CoreEntity {
     })
     @Column({ name: 'rv_difficulty_cd', type: 'varchar', length: 50 })
     @IsEnum(RefVideoDifficultyCode)
-    rvDifficulty: string;
+    rvDifficultyCd: string;
 
     @ApiPropertyOptional({ type: String, description: '학습용 동영상 곡명' })
     @Column({
