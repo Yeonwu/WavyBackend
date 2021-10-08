@@ -13,6 +13,12 @@ import { Analysis } from 'src/analyses/entities/analyses.entity';
 import { Repository } from 'typeorm';
 import { GetS3UploadSignedUrlOutput } from './dtos/get-s3-upload-signed-url.dto';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
+import got from 'got';
+
+class ConvertWebmToMp4LambdaResponse {
+    resultKey: string;
+    resultBucket: string;
+}
 
 @Injectable()
 export class AwsService {
@@ -35,14 +41,21 @@ export class AwsService {
         s3ObjectKey: string,
         mirrorEffect: boolean,
     ): Promise<string> {
-        // TODO
-        // Call convert lambda api
-        // const sourceBucket = this.config.get('AWS_USER_VIDEO_SOURCE_BUCKET');
-        // const destinationBucket = this.config.get(
-        //     'AWS_USER_VIDEO_DESTINATION_BUCKET',
-        // );
-
-        // const apiGateEndPoint = this.config.get('AWS_API_GATEWAY_ENDPOINT');
+        const sourceBucket = this.config.get('AWS_UPLOAD_S3_BUCKET');
+        const destinationBucket = this.config.get(
+            'AWS_USER_VIDEO_DESTINATION_BUCKET',
+        );
+        const requestBody = {
+            's3-source-key': s3ObjectKey,
+            's3-source-bucket': sourceBucket,
+            's3-destination-key': s3ObjectKey.split('.')[0] + '.mp4',
+            's3-destination-bucket': destinationBucket,
+            'mirror-effect': mirrorEffect,
+        };
+        const apiGateEndPoint = this.config.get('AWS_API_GATEWAY_ENDPOINT');
+        await got.post(apiGateEndPoint, {
+            body: JSON.stringify(requestBody),
+        });
 
         return s3ObjectKey.split('.')[0] + '.mp4';
     }
@@ -51,7 +64,7 @@ export class AwsService {
         try {
             const bucket = this.config.get('AWS_UPLOAD_S3_BUCKET');
             const s3ObjectName = await this.generateS3ObjectName();
-            const videoFormat = 'webm';
+            const videoFormat = 'video/webm';
 
             const params = {
                 Bucket: bucket,
