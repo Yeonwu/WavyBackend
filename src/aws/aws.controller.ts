@@ -61,27 +61,4 @@ export class AwsController {
     getS3UploadSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
         return this.awsService.getS3UploadSignedUrl();
     }
-
-    @Get('test')
-    getTest() {
-        return `
-        <form>
-            <input name="file" , type="file" />
-        </form>
-
-        <script>
-            let xhr;
-            let gogo = (signedUrl) => {
-                xhr = new XMLHttpRequest();
-                xhr.open('PUT', signedUrl);
-                let form = document.querySelector('form');
-                let formData = new FormData(form);
-                xhr.onreadystatechange = function () {
-                    console.log(xhr.status);
-                };
-                xhr.send(formData);
-            };
-        </script>
-        `;
-    }
 }
