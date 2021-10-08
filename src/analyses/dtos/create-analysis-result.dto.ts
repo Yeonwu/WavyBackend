@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Analysis } from '../entities/analyses.entity';
 
@@ -9,9 +9,11 @@ export class CreateAnalysisResultInput extends OmitType(Analysis, [
     'creatorSeq',
     'updaterSeq',
     'mbrSeq',
-    'anSeq',
     'anDeleted',
     'refVideo',
+    'rvSeq',
+    'anUserVideoFilename',
+    'anUserVideoDuration',
 ]) {}
 
 export class CreateAnalysisResultOutput extends CoreOutput {

@@ -3,12 +3,15 @@
 </form>
 
 <script>
-    function gogo(signedUrl) {
-        let xhr = new XMLHttpRequest();
+    let xhr;
+    let gogo = (signedUrl) => {
+        xhr = new XMLHttpRequest();
         xhr.open('PUT', signedUrl);
         let form = document.querySelector('form');
         let formData = new FormData(form);
+        xhr.onreadystatechange = function () {
+            console.log(xhr.status);
+        };
         xhr.send(formData);
-        console.log(xhr.response);
-    }
+    };
 </script>

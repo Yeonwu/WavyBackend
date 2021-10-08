@@ -50,7 +50,7 @@ import { S3, SharedIniFileCredentials } from 'aws-sdk';
                 KAKAO_LOGIN_HOST: Joi.string().required(),
                 KAKAO_GRANT_TYPE: Joi.string().required(),
                 BASE_DOMAIN: Joi.string().required(),
-              
+
                 AWS_PROFILE: Joi.string().required(),
                 AWS_PRIVATE_KEY_LOCATION: Joi.string().required(),
                 AWS_UPLOAD_S3_BUCKET: Joi.string().required(),

@@ -8,9 +8,11 @@ import {
     IsString,
     IsUrl,
 } from 'class-validator';
-import { string } from 'joi';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { AnalysisGradeCode } from 'src/common/enums/code.enum';
+import {
+    AnalysisGradeCode,
+    AnalysisStatusCode,
+} from 'src/common/enums/code.enum';
 import { Member } from 'src/members/entities/members.entity';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
@@ -92,44 +94,56 @@ export class Analysis extends CoreEntity {
     anUserVideoDuration: string;
 
     @ApiProperty({
-        description: '사용자 영상 S3 url',
+        description: '사용자 영상 S3 객체명',
         type: String,
     })
-    @Column({ name: 'an_user_video_url', type: 'varchar', length: 255 })
-    @IsUrl()
-    anUserVideoURL: string;
+    @Column({ name: 'an_user_video_filename', type: 'varchar', length: 255 })
+    @IsString()
+    anUserVideoFilename: string;
 
     @ApiProperty({
-        description: '사용자 영상 모션 데이터 S3 url',
+        description: '사용자 영상 모션 데이터 S3 객체명',
         type: String,
         nullable: true,
     })
     @Column({
-        name: 'an_user_video_motion_data_url',
+        name: 'an_user_video_motion_data_filename',
         type: 'varchar',
         length: '255',
         nullable: true,
     })
-    @IsUrl()
+    @IsString()
     @IsOptional()
-    anUserVideoMotionDataURL: string;
+    anUserVideoMotionDataFilename: string;
 
     @ApiProperty({
-        description: '사용자 영상 유사도 분석 데이터 S3 url',
+        description: '사용자 영상 유사도 분석 데이터 S3 객체명',
         type: String,
         nullable: true,
     })
     @Column({
-        name: 'an_simularity_url',
+        name: 'an_simularity_filename',
         type: 'varchar',
         length: 255,
         nullable: true,
     })
-    @IsUrl()
+    @IsString()
     @IsOptional()
-    anSimularityURL: string;
+    anSimularityFilename: string;
 
     @Column({ name: 'an_deleted', type: 'boolean', default: false })
     @IsBoolean()
     anDeleted: boolean;
+
+    @ApiProperty({
+        description: '분석 진행 상황 코드',
+        enum: AnalysisStatusCode,
+    })
+    @Column({
+        name: 'an_status_cd',
+        type: 'varchar',
+        length: 50,
+    })
+    @IsEnum(AnalysisStatusCode)
+    anStatusCode: AnalysisStatusCode;
 }
