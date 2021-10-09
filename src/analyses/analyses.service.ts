@@ -54,7 +54,7 @@ export class AnalysesService {
                     'rv.rvSourceTitle',
                     'rv.rvSourceAccountName',
                     'rv.rvUrl',
-                    'rv.rvDifficulty',
+                    'rv.rvDifficultyCd',
                     'rv.rvSongName',
                     'rv.rvArtistName',
                 ])
@@ -114,7 +114,7 @@ export class AnalysesService {
                     'rv.rvSourceTitle',
                     'rv.rvSourceAccountName',
                     'rv.rvUrl',
-                    'rv.rvDifficulty',
+                    'rv.rvDifficultyCd',
                     'rv.rvSongName',
                     'rv.rvArtistName',
                 ])
