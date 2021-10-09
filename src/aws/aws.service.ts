@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3 } from 'aws-sdk';
+import { Lambda, S3 } from 'aws-sdk';
 import { InjectAwsService } from 'nest-aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import * as cf from 'aws-cloudfront-sign';
@@ -23,10 +23,13 @@ class ConvertWebmToMp4LambdaResponse {
 @Injectable()
 export class AwsService {
     constructor(
-        @InjectAwsService(S3) private readonly s3: S3,
-        private readonly config: ConfigService,
+        @InjectAwsService(S3)
+        private readonly s3: S3,
+        @InjectAwsService(Lambda)
+        private readonly lambda: Lambda,
         @InjectRepository(Analysis)
         private readonly analysisRepo: Repository<Analysis>,
+        private readonly config: ConfigService,
     ) {}
 
     async callAutoMotionWorkerApi(analysis: Analysis, refVideo: RefVideo) {
@@ -46,17 +49,22 @@ export class AwsService {
             'AWS_USER_VIDEO_DESTINATION_BUCKET',
         );
         const requestBody = {
-            's3-source-key': s3ObjectKey,
-            's3-source-bucket': sourceBucket,
-            's3-destination-key': s3ObjectKey.split('.')[0] + '.mp4',
-            's3-destination-bucket': destinationBucket,
-            'mirror-effect': mirrorEffect,
+            body: {
+                's3-source-key': s3ObjectKey,
+                's3-source-bucket': sourceBucket,
+                's3-destination-key': s3ObjectKey.split('.')[0] + '.mp4',
+                's3-destination-bucket': destinationBucket,
+                'mirror-effect': mirrorEffect,
+            },
         };
-        const apiGateEndPoint = this.config.get('AWS_API_GATEWAY_ENDPOINT');
-        await got.post(apiGateEndPoint, {
-            body: JSON.stringify(requestBody),
-        });
+        const result = await this.lambda
+            .invoke({
+                FunctionName: 'lambda-convert-webm-to-mp4',
+                Payload: JSON.stringify(requestBody),
+            })
+            .promise();
 
+        console.log(result);
         return s3ObjectKey.split('.')[0] + '.mp4';
     }
 

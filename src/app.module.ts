@@ -25,7 +25,7 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AwsModule } from './aws/aws.module';
 import { AwsSdkModule } from 'nest-aws-sdk';
-import { S3, SharedIniFileCredentials } from 'aws-sdk';
+import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
 
 @Module({
     imports: [
@@ -91,7 +91,7 @@ import { S3, SharedIniFileCredentials } from 'aws-sdk';
                     profile: process.env.AWS_PROFILE,
                 }),
             },
-            services: [S3],
+            services: [S3, Lambda],
         }),
         MembersModule,
         PracticesModule,
