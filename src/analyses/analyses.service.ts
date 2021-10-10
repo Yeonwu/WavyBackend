@@ -63,7 +63,18 @@ export class AnalysesService {
                 .limit(PaginationInput.take)
                 .offset(PaginationInput.skip(+page))
                 .getMany();
-            return { ok: true, analyses: analyses };
+
+            const totalResultsQueryResult = await this.analyses.manager.query(`
+                SELECT COUNT(*)
+                FROM analysis
+                WHERE mbr_seq = ${mbrSeq}
+                AND an_deleted = false
+            `);
+
+            const totalResults = +totalResultsQueryResult[0].count;
+            const totalPages = Math.ceil(totalResults / PaginationInput.take);
+
+            return { ok: true, totalResults, totalPages, analyses };
         } catch (error) {
             console.log(error.stack, error.message);
 
@@ -71,21 +82,6 @@ export class AnalysesService {
                 ok: false,
                 error: '분석 결과 목록을 불러오지 못했습니다.',
             };
-        }
-    }
-
-    private parseOrderBy(orderBy: string): ParceOrderByOutput {
-        switch (orderBy) {
-            case 'latest':
-                return { orderByColumn: 'an.createdDate', orderByType: 'DESC' };
-            case 'oldest':
-                return { orderByColumn: 'an.createdDate', orderByType: 'ASC' };
-            case 'highest-score':
-                return { orderByColumn: 'an.anScore', orderByType: 'DESC' };
-            case 'lowest-score':
-                return { orderByColumn: 'an.anScore', orderByType: 'ASC' };
-            default:
-                return { orderByColumn: 'an.createdDate', orderByType: 'DESC' };
         }
     }
 
@@ -101,7 +97,7 @@ export class AnalysesService {
 
             const { orderByColumn, orderByType } = this.parseOrderBy(orderBy);
 
-            const analysis = await this.analyses
+            const analyses = await this.analyses
                 .createQueryBuilder('an')
                 .leftJoinAndSelect('an.refVideo', 'rv')
                 .select([
@@ -140,7 +136,26 @@ export class AnalysesService {
                 .limit(PaginationInput.take)
                 .offset(PaginationInput.skip(+page))
                 .getMany();
-            return { ok: true, analyses: analysis };
+
+            const totalResultsQueryResult = await this.analyses.manager.query(`
+                SELECT COUNT(*)
+                FROM analysis AS an
+                JOIN ref_video AS rv
+                  ON rv.rv_seq = an.rv_seq
+                WHERE mbr_seq = ${mbrSeq}
+                AND an_deleted = false
+                AND (
+                    rv.rv_source_title LIKE '%${query}%'
+                    OR rv.rv_source_account_name LIKE '%${query}%'
+                    OR rv.rv_song_name LIKE '%${query}%'
+                    OR rv.rv_artist_name LIKE '%${query}%'
+                )
+            `);
+
+            const totalResults = +totalResultsQueryResult[0].count;
+            const totalPages = Math.ceil(totalResults / PaginationInput.take);
+
+            return { ok: true, totalResults, totalPages, analyses };
         } catch (error) {
             console.log(error.stack, error.message);
 
@@ -295,6 +310,21 @@ export class AnalysesService {
         } catch (error) {
             console.log(error.stack, error.message);
             return { ok: false, error: '분석 요청에 실패했습니다.' };
+        }
+    }
+
+    private parseOrderBy(orderBy: string): ParceOrderByOutput {
+        switch (orderBy) {
+            case 'latest':
+                return { orderByColumn: 'an.createdDate', orderByType: 'DESC' };
+            case 'oldest':
+                return { orderByColumn: 'an.createdDate', orderByType: 'ASC' };
+            case 'highest-score':
+                return { orderByColumn: 'an.anScore', orderByType: 'DESC' };
+            case 'lowest-score':
+                return { orderByColumn: 'an.anScore', orderByType: 'ASC' };
+            default:
+                return { orderByColumn: 'an.createdDate', orderByType: 'DESC' };
         }
     }
 
