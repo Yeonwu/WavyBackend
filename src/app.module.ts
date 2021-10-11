@@ -90,6 +90,10 @@ import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
                 credentials: new SharedIniFileCredentials({
                     profile: process.env.AWS_PROFILE,
                 }),
+                // TODO: convert mp4 Lambda to async...
+                httpOptions: {
+                    timeout: 300000,
+                },
             },
             services: [S3, Lambda],
         }),
