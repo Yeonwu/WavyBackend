@@ -291,20 +291,16 @@ export class AnalysesService {
                 newAnalysis,
             );
 
-            const response = await this.registerAnalysisInQueue(
-                savedAnalysis,
-                refVideo,
-                mirrorEffect,
-            );
-
-            if (response) {
-                newAnalysis.anStatusCode = AnalysisStatusCode.PROCESSING;
-                await this.analyses.save(newAnalysis);
-            } else {
-                newAnalysis.anStatusCode = AnalysisStatusCode.FAIL;
-                await this.analyses.save(newAnalysis);
-                return { ok: false, error: '분석 요청에 실패했습니다.' };
-            }
+            this.registerAnalysisInQueue(savedAnalysis, refVideo, mirrorEffect)
+                .then(async () => {
+                    savedAnalysis.anStatusCode = AnalysisStatusCode.PROCESSING;
+                    await this.analyses.save(savedAnalysis);
+                })
+                .catch(async (err) => {
+                    savedAnalysis.anStatusCode = AnalysisStatusCode.FAIL;
+                    await this.analyses.save(savedAnalysis);
+                    console.error(err);
+                });
 
             return { ok: true, savedAnalysis };
         } catch (error) {
@@ -332,21 +328,15 @@ export class AnalysesService {
         analysis: Analysis,
         refVideo: RefVideo,
         mirrorEffect: boolean,
-    ): Promise<boolean> {
-        try {
-            const newUserVideoFileName = await this.awsService.convertWebmToMp4(
-                analysis.anUserVideoFilename,
-                mirrorEffect,
-            );
+    ): Promise<void> {
+        const newUserVideoFileName = await this.awsService.convertWebmToMp4(
+            analysis.anUserVideoFilename,
+            mirrorEffect,
+        );
 
-            analysis.anUserVideoFilename = newUserVideoFileName;
-            this.analyses.save(analysis);
+        analysis.anUserVideoFilename = newUserVideoFileName;
+        this.analyses.save(analysis);
 
-            await this.awsService.callAutoMotionWorkerApi(analysis, refVideo);
-            return true;
-        } catch (error) {
-            console.log(error.stack);
-            return false;
-        }
+        await this.awsService.callAutoMotionWorkerApi(analysis, refVideo);
     }
 }
