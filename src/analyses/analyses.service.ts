@@ -231,12 +231,16 @@ export class AnalysesService {
         analysisInput: CreateAnalysisResultInput,
     ): Promise<CreateAnalysisResultOutput> {
         try {
-            const newAnalysis = await this.analyses.findOne({
-                anSeq: analysisInput.anSeq,
-            });
+            const newAnalysis = await this.analyses
+                .createQueryBuilder('an')
+                .select()
+                .leftJoin('an.member', 'mbr')
+                .where('an.anSeq = :anSeq', { anSeq: analysisInput.anSeq })
+                .andWhere('mbr.mbrSeq = :mbrSeq', { mbrSeq })
+                .getOne();
 
             if (!newAnalysis) {
-                throw new Error('Cannot get analysis');
+                return { ok: false, error: 'Cannot find analysis' };
             }
 
             newAnalysis.anSimularityFilename =
@@ -245,6 +249,7 @@ export class AnalysesService {
                 analysisInput.anUserVideoMotionDataFilename;
             newAnalysis.anScore = analysisInput.anScore;
             newAnalysis.anGradeCode = analysisInput.anGradeCode;
+            newAnalysis.anStatusCode = analysisInput.anStatusCode;
 
             newAnalysis.updaterSeq = mbrSeq;
 
