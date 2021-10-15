@@ -101,12 +101,19 @@ export class MbrStaticsSerivce {
     private async getFavorateDancer(memberSeq: string): Promise<string> {
         const getFavorateDancerSQL = `
             SELECT rv.rv_artist_name, COUNT(rv.rv_artist_name)
-            FROM practice AS pt
+            FROM (
+                SELECT rv_seq
+                FROM practice
+                WHERE mbr_seq = ${memberSeq}
+                UNION ALL
+                SELECT rv_seq
+                FROM analysis
+                WHERE mbr_seq = ${memberSeq}
+            ) AS t
             JOIN ref_video AS rv
-                ON rv.rv_seq = pt.rv_seq
-            WHERE mbr_seq = ${memberSeq}
+                ON rv.rv_seq = t.rv_seq
             GROUP BY rv.rv_artist_name
-            ORDER BY count DESC
+            ORDER BY count DESC;
         `;
         const favorateDancerQueryResult = await this.manager.query(
             getFavorateDancerSQL,
