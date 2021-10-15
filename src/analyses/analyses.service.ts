@@ -39,6 +39,8 @@ export class AnalysesService {
         page: string,
     ): Promise<GetAnalysesOutput> {
         try {
+            const { orderByColumn, orderByType } = this.parseOrderBy('latest');
+
             const analyses = await this.analyses
                 .createQueryBuilder('an')
                 .leftJoinAndSelect('an.refVideo', 'rv')
@@ -60,6 +62,7 @@ export class AnalysesService {
                 ])
                 .where('an.mbr_seq = :id', { id: mbrSeq })
                 .andWhere('an.an_deleted = false')
+                .orderBy(orderByColumn, orderByType)
                 .limit(PaginationInput.take)
                 .offset(PaginationInput.skip(+page))
                 .getMany();
