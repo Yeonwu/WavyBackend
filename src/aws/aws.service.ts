@@ -86,14 +86,14 @@ export class AwsService {
                 'mirror-effect': mirrorEffect,
             },
         };
-        // const result = await this.lambda
-        //     .invoke({
-        //         FunctionName: 'lambda-convert-webm-to-mp4',
-        //         Payload: JSON.stringify(requestBody),
-        //     })
-        //     .promise();
+        const result = await this.lambda
+            .invoke({
+                FunctionName: 'lambda-convert-webm-to-mp4',
+                Payload: JSON.stringify(requestBody),
+            })
+            .promise();
 
-        // console.log(result);
+        console.log(result);
         return s3ObjectKey.split('.')[0] + '.mp4';
     }
 
