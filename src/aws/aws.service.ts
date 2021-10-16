@@ -32,12 +32,42 @@ export class AwsService {
         private readonly config: ConfigService,
     ) {}
 
-    async callAutoMotionWorkerApi(analysis: Analysis, refVideo: RefVideo) {
-        /**
-         * TODO
-         * 인공지능 돌리는 EC2에 분석 요청
-         */
-        return true;
+    async callUserVideoAnalystApi(
+        analysis: Analysis,
+        refVideo: RefVideo,
+        jwt: string,
+    ) {
+        try {
+            const url = this.config.get('USER_VIDEO_ANALYST_REQ_URL');
+            const headers = {
+                Authorization: `${jwt}`,
+                'Content-Type': 'application/json',
+            };
+            console.log(refVideo);
+            const body = {
+                an_seq: analysis.anSeq,
+                user_video_filename: analysis.anUserVideoFilename,
+                user_sec: analysis.anUserVideoDuration,
+                ref_json_filename: refVideo.rvPoseDataUrl.split('.com/')[1],
+                ref_sec: refVideo.rvDuration,
+            };
+
+            await got.post(url, {
+                headers,
+                json: body,
+            });
+
+            console.log(url);
+            console.log(headers);
+            console.log(body);
+
+            return true;
+        } catch (error) {
+            console.log(error.stack, error.message);
+            console.log(error.response.body);
+
+            return false;
+        }
     }
 
     async convertWebmToMp4(

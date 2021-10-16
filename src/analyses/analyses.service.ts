@@ -234,12 +234,16 @@ export class AnalysesService {
         analysisInput: CreateAnalysisResultInput,
     ): Promise<CreateAnalysisResultOutput> {
         try {
-            const newAnalysis = await this.analyses.findOne({
-                anSeq: analysisInput.anSeq,
-            });
+            const newAnalysis = await this.analyses
+                .createQueryBuilder('an')
+                .select()
+                .leftJoin('an.member', 'mbr')
+                .where('an.anSeq = :anSeq', { anSeq: analysisInput.anSeq })
+                .andWhere('mbr.mbrSeq = :mbrSeq', { mbrSeq })
+                .getOne();
 
             if (!newAnalysis) {
-                throw new Error('Cannot get analysis');
+                return { ok: false, error: 'Cannot find analysis' };
             }
 
             newAnalysis.anSimularityFilename =
@@ -248,6 +252,7 @@ export class AnalysesService {
                 analysisInput.anUserVideoMotionDataFilename;
             newAnalysis.anScore = analysisInput.anScore;
             newAnalysis.anGradeCode = analysisInput.anGradeCode;
+            newAnalysis.anStatusCode = analysisInput.anStatusCode;
 
             newAnalysis.updaterSeq = mbrSeq;
 
@@ -266,6 +271,7 @@ export class AnalysesService {
     async createAnalysisRequest(
         member: Member,
         createAnalysisRequestInput: CreateAnalysisRequestInput,
+        jwt: string,
     ) {
         try {
             const { rvSeq, anUserVideoFilename, mirrorEffect } =
@@ -275,11 +281,10 @@ export class AnalysesService {
                 anUserVideoFilename,
             });
 
-            const { refVideo, ok } = await this.refVideos.findRefVideoById(
-                rvSeq,
-            );
+            const { refVideo, ok, error } =
+                await this.refVideos.findRefVideoById(rvSeq);
             if (!ok) {
-                throw new Error('Cannot find ref video');
+                return { ok, error };
             }
             newAnalysis.refVideo = refVideo;
             newAnalysis.anUserVideoDuration = refVideo.rvDuration;
@@ -294,16 +299,21 @@ export class AnalysesService {
                 newAnalysis,
             );
 
-            this.registerAnalysisInQueue(savedAnalysis, refVideo, mirrorEffect)
-                .then(async () => {
-                    savedAnalysis.anStatusCode = AnalysisStatusCode.PROCESSING;
-                    await this.analyses.save(savedAnalysis);
-                })
-                .catch(async (err) => {
-                    savedAnalysis.anStatusCode = AnalysisStatusCode.FAIL;
-                    await this.analyses.save(savedAnalysis);
-                    console.error(err);
-                });
+            const response = await this.registerAnalysisInQueue(
+                savedAnalysis,
+                refVideo,
+                jwt,
+                mirrorEffect,
+            );
+
+            if (response) {
+                newAnalysis.anStatusCode = AnalysisStatusCode.PROCESSING;
+                await this.analyses.save(newAnalysis);
+            } else {
+                newAnalysis.anStatusCode = AnalysisStatusCode.FAIL;
+                await this.analyses.save(newAnalysis);
+                return { ok: false, error: '분석 요청에 실패했습니다.' };
+            }
 
             return { ok: true, savedAnalysis };
         } catch (error) {
@@ -330,6 +340,7 @@ export class AnalysesService {
     private async registerAnalysisInQueue(
         analysis: Analysis,
         refVideo: RefVideo,
+        jwt: string,
         mirrorEffect: boolean,
     ): Promise<void> {
         const newUserVideoFileName = await this.awsService.convertWebmToMp4(
@@ -337,9 +348,20 @@ export class AnalysesService {
             mirrorEffect,
         );
 
-        analysis.anUserVideoFilename = newUserVideoFileName;
-        this.analyses.save(analysis);
+            analysis.anUserVideoFilename = newUserVideoFileName;
+            await this.analyses.save(analysis);
 
-        await this.awsService.callAutoMotionWorkerApi(analysis, refVideo);
+            const isRequestSuccessful =
+                await this.awsService.callUserVideoAnalystApi(
+                    analysis,
+                    refVideo,
+                    jwt,
+                );
+
+            return isRequestSuccessful;
+        } catch (error) {
+            console.log(error.stack, error.message);
+            return false;
+        }
     }
 }

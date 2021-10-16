@@ -5,7 +5,9 @@ import {
     Get,
     Param,
     Post,
+    Put,
     Query,
+    Req,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -17,7 +19,8 @@ import {
     ApiParam,
     ApiTags,
 } from '@nestjs/swagger';
-import { AuthJwt } from 'src/auth/auth-jwt.decorator';
+import { Request } from 'express';
+import { AuthJwt, RawJwt } from 'src/auth/auth-jwt.decorator';
 import { AuthMember } from 'src/auth/auth-member.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
@@ -115,11 +118,13 @@ export class AnalysesController {
     @UseGuards(MemberGuard)
     createAnalysisRequest(
         @AuthMember() member: Member,
+        @RawJwt() jwt: string,
         @Body() createAnalysisRequestInput: CreateAnalysisRequestInput,
     ): Promise<CreateAnalysisResultOutput> {
         return this.analysesService.createAnalysisRequest(
             member,
             createAnalysisRequestInput,
+            jwt,
         );
     }
 
@@ -133,14 +138,14 @@ export class AnalysesController {
             '영상 분석 결과를 DB에 등록하고 분석결과정보를 조회합니다.',
         type: CreateAnalysisResultOutput,
     })
-    @Post('result')
+    @Put('result')
     @UseGuards(MemberGuard)
     async createAnalysisResult(
-        @AuthJwt() jwt: AuthJwtDecoded,
+        @AuthMember() member: Member,
         @Body() analysis: CreateAnalysisResultInput,
     ): Promise<CreateAnalysisResultOutput> {
         return await this.analysesService.createAnalysisResult(
-            jwt.mbrSeq,
+            member.mbrSeq,
             analysis,
         );
     }
