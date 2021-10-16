@@ -88,9 +88,16 @@ export class MbrStaticsSerivce {
 
     private async getTotalPracticeTime(memberSeq: string): Promise<string> {
         const getTotalPracticeTimeSQL = `
-            SELECT SUM(pt_finished - pt_started) AS sum
-            FROM practice
-            WHERE mbr_seq = ${memberSeq}
+            SELECT SUM(duration) as sum
+            FROM (
+                SELECT an_user_video_duration - '00:00:00' AS duration
+                FROM analysis
+                WHERE mbr_seq = ${memberSeq}
+                UNION ALL
+                SELECT (pt_finished - pt_started) AS duration
+                FROM practice
+                WHERE mbr_seq = ${memberSeq}
+            ) AS t
         `;
         const totalPratcieTimeQueryResult = await this.manager.query(
             getTotalPracticeTimeSQL,
@@ -101,12 +108,19 @@ export class MbrStaticsSerivce {
     private async getFavorateDancer(memberSeq: string): Promise<string> {
         const getFavorateDancerSQL = `
             SELECT rv.rv_artist_name, COUNT(rv.rv_artist_name)
-            FROM practice AS pt
+            FROM (
+                SELECT rv_seq
+                FROM practice
+                WHERE mbr_seq = ${memberSeq}
+                UNION ALL
+                SELECT rv_seq
+                FROM analysis
+                WHERE mbr_seq = ${memberSeq}
+            ) AS t
             JOIN ref_video AS rv
-                ON rv.rv_seq = pt.rv_seq
-            WHERE mbr_seq = ${memberSeq}
+                ON rv.rv_seq = t.rv_seq
             GROUP BY rv.rv_artist_name
-            ORDER BY count DESC
+            ORDER BY count DESC;
         `;
         const favorateDancerQueryResult = await this.manager.query(
             getFavorateDancerSQL,

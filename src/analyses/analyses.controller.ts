@@ -9,6 +9,7 @@ import {
     Query,
     Req,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
@@ -25,6 +26,7 @@ import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
+import { TimeoutInterceptor } from 'src/common/timeout.interceptor';
 import { Member } from 'src/members/entities/members.entity';
 import { AnalysesService } from './analyses.service';
 import { CreateAnalysisRequestInput } from './dtos/create-analysis-request.dto';
@@ -112,6 +114,7 @@ export class AnalysesController {
         description: '사용자 영상 분석을 Queue에 등록하는 API입니다.',
     })
     @Post()
+    @UseInterceptors(TimeoutInterceptor)
     @UseGuards(MemberGuard)
     createAnalysisRequest(
         @AuthMember() member: Member,
