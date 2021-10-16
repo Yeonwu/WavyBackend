@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class KakaoRedirectInput {
     @ApiPropertyOptional({
@@ -10,7 +10,7 @@ export class KakaoRedirectInput {
 
     @ApiPropertyOptional({
         description:
-            'CSRF 공격 차단을 위한 파라미터. 아직 개발되지는 않았지만, 카카오 공식문서애 표시되어 있어서 넣었습니다.',
+            'CSRF 공격 차단을 위한 파라미터. 아직 개발되지는 않았지만, 카카오 공식문서에 표시되어 있어서 넣었습니다.',
     })
     state?: string;
 

@@ -72,8 +72,8 @@ export class AuthController {
         type: GetJwtOutput,
     })
     @Get('token')
-    getJwtToken(@Query() { code }: GetJwtInput): Promise<GetJwtOutput> {
-        return this.authService.getJwt(code);
+    getJwtToken(@Query() getJwtInput: GetJwtInput): Promise<GetJwtOutput> {
+        return this.authService.getJwt(getJwtInput);
     }
 
     @ApiOperation({
