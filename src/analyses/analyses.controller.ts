@@ -19,7 +19,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
-import { AuthJwt } from 'src/auth/auth-jwt.decorator';
+import { AuthJwt, RawJwt } from 'src/auth/auth-jwt.decorator';
 import { AuthMember } from 'src/auth/auth-member.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
@@ -115,11 +115,13 @@ export class AnalysesController {
     @UseGuards(MemberGuard)
     createAnalysisRequest(
         @AuthMember() member: Member,
+        @RawJwt() jwt: string,
         @Body() createAnalysisRequestInput: CreateAnalysisRequestInput,
     ): Promise<CreateAnalysisResultOutput> {
         return this.analysesService.createAnalysisRequest(
             member,
             createAnalysisRequestInput,
+            jwt,
         );
     }
 
