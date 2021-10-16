@@ -268,6 +268,7 @@ export class AnalysesService {
     async createAnalysisRequest(
         member: Member,
         createAnalysisRequestInput: CreateAnalysisRequestInput,
+        jwt: string,
     ) {
         try {
             const { rvSeq, anUserVideoFilename, mirrorEffect } =
@@ -277,11 +278,10 @@ export class AnalysesService {
                 anUserVideoFilename,
             });
 
-            const { refVideo, ok } = await this.refVideos.findRefVideoById(
-                rvSeq,
-            );
+            const { refVideo, ok, error } =
+                await this.refVideos.findRefVideoById(rvSeq);
             if (!ok) {
-                throw new Error('Cannot find ref video');
+                return { ok, error };
             }
             newAnalysis.refVideo = refVideo;
             newAnalysis.anUserVideoDuration = refVideo.rvDuration;
@@ -299,6 +299,7 @@ export class AnalysesService {
             const response = await this.registerAnalysisInQueue(
                 savedAnalysis,
                 refVideo,
+                jwt,
                 mirrorEffect,
             );
 
@@ -336,6 +337,7 @@ export class AnalysesService {
     private async registerAnalysisInQueue(
         analysis: Analysis,
         refVideo: RefVideo,
+        jwt: string,
         mirrorEffect: boolean,
     ): Promise<boolean> {
         try {
@@ -345,12 +347,18 @@ export class AnalysesService {
             );
 
             analysis.anUserVideoFilename = newUserVideoFileName;
-            this.analyses.save(analysis);
+            await this.analyses.save(analysis);
 
-            await this.awsService.callAutoMotionWorkerApi(analysis, refVideo);
-            return true;
+            const isRequestSuccessful =
+                await this.awsService.callUserVideoAnalystApi(
+                    analysis,
+                    refVideo,
+                    jwt,
+                );
+
+            return isRequestSuccessful;
         } catch (error) {
-            console.log(error.stack);
+            console.log(error.stack, error.message);
             return false;
         }
     }
