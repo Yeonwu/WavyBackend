@@ -342,11 +342,12 @@ export class AnalysesService {
         refVideo: RefVideo,
         jwt: string,
         mirrorEffect: boolean,
-    ): Promise<void> {
-        const newUserVideoFileName = await this.awsService.convertWebmToMp4(
-            analysis.anUserVideoFilename,
-            mirrorEffect,
-        );
+    ): Promise<boolean> {
+        try {
+            const newUserVideoFileName = await this.awsService.convertWebmToMp4(
+                analysis.anUserVideoFilename,
+                mirrorEffect,
+            );
 
             analysis.anUserVideoFilename = newUserVideoFileName;
             await this.analyses.save(analysis);

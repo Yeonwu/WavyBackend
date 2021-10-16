@@ -51,15 +51,14 @@ export class AwsService {
                 ref_json_filename: refVideo.rvPoseDataUrl.split('.com/')[1],
                 ref_sec: refVideo.rvDuration,
             };
+            console.log(url);
+            console.log(headers);
+            console.log(body);
 
             await got.post(url, {
                 headers,
                 json: body,
             });
-
-            console.log(url);
-            console.log(headers);
-            console.log(body);
 
             return true;
         } catch (error) {
@@ -87,14 +86,14 @@ export class AwsService {
                 'mirror-effect': mirrorEffect,
             },
         };
-        const result = await this.lambda
-            .invoke({
-                FunctionName: 'lambda-convert-webm-to-mp4',
-                Payload: JSON.stringify(requestBody),
-            })
-            .promise();
+        // const result = await this.lambda
+        //     .invoke({
+        //         FunctionName: 'lambda-convert-webm-to-mp4',
+        //         Payload: JSON.stringify(requestBody),
+        //     })
+        //     .promise();
 
-        console.log(result);
+        // console.log(result);
         return s3ObjectKey.split('.')[0] + '.mp4';
     }
 
