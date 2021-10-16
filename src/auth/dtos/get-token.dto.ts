@@ -12,7 +12,7 @@ export class GetJwtOutput extends CoreOutput {
 export class GetJwtInput extends PickType(KakaoRedirectInput, ['code']) {
     @ApiProperty({
         description:
-            '리다이렉트할 url입니다. ex) http://localhost:3000/auth/kakaoLoginRedirect(O), https://www.wavy.dance/auth/kakaoLoginRedirect(O), https://wavy.dance(X) www.wavy.dance(X)',
+            '리다이렉트할 url입니다. ex) http://localhost:3000/auth/kakaoLoginRedirect(X), https://www.wavy.dance/auth/kakaoLoginRedirect(X), https://wavy.dance(O)',
         type: String,
     })
     @IsString()
