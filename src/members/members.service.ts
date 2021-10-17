@@ -172,9 +172,9 @@ export class MembersService {
 
         switch (member.certificationMethodCode) {
             case MemberCertificationMethodCode.KAKAO:
-                member.mbrKakaoSeq = '0';
+                member.mbrKakaoSeq = null;
             default:
-                member.mbrKakaoSeq = '0';
+                member.mbrKakaoSeq = null;
         }
 
         await this.members.save(member);
@@ -212,6 +212,7 @@ export class MembersService {
 
             return { ok: true };
         } catch (error) {
+            console.log(error.message, error.stack);
             return { ok: false, error: '회원 정보 삭제에 실패했습니다.' };
         }
     }
