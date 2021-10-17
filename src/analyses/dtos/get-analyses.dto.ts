@@ -21,6 +21,12 @@ export class GetAnalysisBySeqOutput extends CoreOutput {
     })
     @IsOptional()
     analysis?: Analysis;
+
+    @ApiPropertyOptional({
+        description: '분석 결과 json',
+    })
+    @IsOptional()
+    simularityJson?: any;
 }
 
 export class GetAnalysesBySeqInput {

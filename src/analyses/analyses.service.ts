@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import got from 'got';
 import { AwsService } from 'src/aws/aws.service';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
@@ -156,15 +157,18 @@ export class AnalysesService {
                 .andWhere('an.an_deleted = false')
                 .getOne();
 
-            analysis.anSimularityFilename = `${this.configService.get(
+            const simularityFilename = `${this.configService.get(
                 'AWS_AN_JSON_BUCKET_ENDPOINT',
             )}/${analysis.anSimularityFilename}`;
 
-            analysis.anUserVideoMotionDataFilename = `${this.configService.get(
+            const userVideoMotionDataFilename = `${this.configService.get(
                 'AWS_AN_JSON_BUCKET_ENDPOINT',
             )}/${analysis.anUserVideoMotionDataFilename}`;
 
-            return { ok: true, analysis: analysis };
+            const simularityJson = await got.get(simularityFilename).json();
+            // const userVideoMotionDataJson = await got.get(userVideoMotionDataFilename)
+
+            return { ok: true, analysis: analysis, simularityJson };
         } catch (error) {
             console.log(error.stack, error.message);
             return {
