@@ -4,12 +4,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MembersService } from 'src/members/members.service';
 import {
+    GetJwtInput,
     GetJwtOutput,
     GetKakaoTokenOutput,
     UnlinkTokenOutput,
 } from './dtos/get-token.dto';
 import * as camelcaseKeys from 'camelcase-keys';
-import { Member } from 'src/members/entities/members.entity';
 import { GetKakoLoginUrlOutput } from './dtos/get-kakak-login-url.dto';
 
 @Injectable()
@@ -39,14 +39,16 @@ export class AuthService {
         }
     }
 
-    async getJwt(code: string): Promise<GetJwtOutput> {
+    async getJwt(getJwtInput: GetJwtInput): Promise<GetJwtOutput> {
         try {
-            const kakaoTokens = await this.getKakaoToken(code);
+            const { code, redirectUrl } = getJwtInput;
+            const kakaoTokens = await this.getKakaoToken(code, redirectUrl);
             const mbrKakaoSeq = await this.getMbrKakaoSeq(
                 kakaoTokens.accessToken,
             );
-            const { ok, error, member } =
-                await this.memberService.getMemberByKakaoSeq(mbrKakaoSeq);
+            const { member } = await this.memberService.getMemberByKakaoSeq(
+                mbrKakaoSeq,
+            );
 
             const jwtToken = this.createJwt(
                 member?.mbrSeq,
@@ -84,10 +86,13 @@ export class AuthService {
         }
     }
 
-    private async getKakaoToken(code: string): Promise<GetKakaoTokenOutput> {
+    private async getKakaoToken(
+        code: string,
+        redirectUrl: string,
+    ): Promise<GetKakaoTokenOutput> {
         try {
             const hostName = this.configService.get('KAKAO_LOGIN_HOST');
-            const baseDomain = this.configService.get('BASE_DOMAIN');
+            const baseDomain = redirectUrl;
 
             const url = `https://${hostName}/oauth/token`;
 
@@ -116,7 +121,8 @@ export class AuthService {
         } catch (error) {
             error.message += `\n 
             error args at getKakaoToken \n
-            code: ${code}
+            code: ${code} \n
+            response body: ${error.response.body}
             `;
             throw error;
         }
