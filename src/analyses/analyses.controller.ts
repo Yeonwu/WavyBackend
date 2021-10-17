@@ -91,8 +91,7 @@ export class AnalysesController {
 
     @ApiOperation({
         summary: '분석결과 ID로 조회',
-        description:
-            '분석결과를 ID를 사용해 조회합니다. anSimularityFilename, anUserVideoMotionDataFilename은 바로 접근할 수 있는 URL로 변환되어 제공합니다.',
+        description: '분석결과를 ID를 사용해 조회합니다.',
     })
     @ApiOkResponse({
         description: '분석결과를 ID를 사용해 조회합니다.',
