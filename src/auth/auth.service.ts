@@ -10,7 +10,6 @@ import {
     UnlinkTokenOutput,
 } from './dtos/get-token.dto';
 import * as camelcaseKeys from 'camelcase-keys';
-import { Member } from 'src/members/entities/members.entity';
 import { GetKakoLoginUrlOutput } from './dtos/get-kakak-login-url.dto';
 
 @Injectable()
