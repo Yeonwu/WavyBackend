@@ -116,6 +116,17 @@ export class BookmarksService {
         return count > 0 ? true : false;
     }
 
+    async findBookmarkByMbrSeq(mbrSeq: string): Promise<[RefVideo]> {
+        const sql = `
+                SELECT * FROM ref_video AS rv
+                JOIN (SELECT * FROM bookmarks
+                WHERE mbr_seq = ${mbrSeq}) AS bm 
+                ON bm.rv_seq = rv.rv_seq
+            `;
+        const sqlRawResults = await this.members.query(sql);
+        return camelcaseKeys(sqlRawResults);
+    }
+
     async createBookmark(
         authMember: Member,
         { rvSeq }: CreateBookmarkInput,
@@ -139,8 +150,13 @@ export class BookmarksService {
                     error: '이미 보관된 영상입니다',
                 };
             }
-            member.bookmarkedRefVideos = [refVideo];
-            await this.members.manager.save(member);
+            const results = await this.findBookmarkByMbrSeq(member.mbrSeq);
+            const refVideos = results.map((refVideo) =>
+                this.refVideos.create(refVideo),
+            );
+            refVideos.push(refVideo);
+            member.bookmarkedRefVideos = refVideos;
+            await this.members.save(member);
             return {
                 ok: true,
                 bookmarkedRefVideo: refVideo,
