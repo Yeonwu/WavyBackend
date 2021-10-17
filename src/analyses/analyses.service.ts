@@ -44,22 +44,7 @@ export class AnalysesService {
             const analyses = await this.analyses
                 .createQueryBuilder('an')
                 .leftJoinAndSelect('an.refVideo', 'rv')
-                .select([
-                    'an.createdDate',
-                    'an.anSeq',
-                    'an.anScore',
-                    'an.anScore',
-                    'an.anGradeCode',
-                    'an.anUserVideoFilename',
-                    'rv.rvSeq',
-                    'rv.rvSource',
-                    'rv.rvSourceTitle',
-                    'rv.rvSourceAccountName',
-                    'rv.rvUrl',
-                    'rv.rvDifficultyCd',
-                    'rv.rvSongName',
-                    'rv.rvArtistName',
-                ])
+                .select()
                 .where('an.mbr_seq = :id', { id: mbrSeq })
                 .andWhere('an.an_deleted = false')
                 .orderBy(orderByColumn, orderByType)
@@ -103,20 +88,7 @@ export class AnalysesService {
             const analyses = await this.analyses
                 .createQueryBuilder('an')
                 .leftJoinAndSelect('an.refVideo', 'rv')
-                .select([
-                    'an.anSeq',
-                    'an.anScore',
-                    'an.anGradeCode',
-                    'an.anUserVideoFilename',
-                    'rv.rvSeq',
-                    'rv.rvSource',
-                    'rv.rvSourceTitle',
-                    'rv.rvSourceAccountName',
-                    'rv.rvUrl',
-                    'rv.rvDifficultyCd',
-                    'rv.rvSongName',
-                    'rv.rvArtistName',
-                ])
+                .select()
                 .where('an.mbr_seq = :id', { id: mbrSeq })
                 .andWhere('an.an_deleted = false')
                 .andWhere(
