@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsService } from 'src/aws/aws.service';
 import { CoreOutput } from 'src/common/dtos/output.dto';
@@ -32,6 +33,7 @@ export class AnalysesService {
         private readonly analyses: Repository<Analysis>,
         private readonly refVideos: RefVideosService,
         private readonly awsService: AwsService,
+        private readonly configService: ConfigService,
     ) {}
 
     async getAnalyses(
@@ -153,6 +155,14 @@ export class AnalysesService {
                 .andWhere('an.an_seq = :anSeq', { anSeq })
                 .andWhere('an.an_deleted = false')
                 .getOne();
+
+            analysis.anSimularityFilename = `${this.configService.get(
+                'AWS_AN_JSON_BUCKET_ENDPOINT',
+            )}/${analysis.anSimularityFilename}`;
+
+            analysis.anUserVideoMotionDataFilename = `${this.configService.get(
+                'AWS_AN_JSON_BUCKET_ENDPOINT',
+            )}/${analysis.anUserVideoMotionDataFilename}`;
 
             return { ok: true, analysis: analysis };
         } catch (error) {
