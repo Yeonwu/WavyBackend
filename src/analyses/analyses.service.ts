@@ -157,16 +157,9 @@ export class AnalysesService {
                 .andWhere('an.an_deleted = false')
                 .getOne();
 
-            const simularityFilename = `${this.configService.get(
-                'AWS_AN_JSON_BUCKET_ENDPOINT',
-            )}/${analysis.anSimularityFilename}`;
-
-            const userVideoMotionDataFilename = `${this.configService.get(
-                'AWS_AN_JSON_BUCKET_ENDPOINT',
-            )}/${analysis.anUserVideoMotionDataFilename}`;
-
-            const simularityJson = await got.get(simularityFilename).json();
-            // const userVideoMotionDataJson = await got.get(userVideoMotionDataFilename)
+            const simularityJson = this.getSimularityJson(
+                analysis.anSimularityFilename,
+            );
 
             return { ok: true, analysis: analysis, simularityJson };
         } catch (error) {
@@ -175,6 +168,18 @@ export class AnalysesService {
                 ok: false,
                 error: '분석 결과를 불러오지 못했습니다.',
             };
+        }
+    }
+
+    private async getSimularityJson(simularityFilename: string) {
+        try {
+            const simularityFullPath = `${this.configService.get(
+                'AWS_AN_JSON_BUCKET_ENDPOINT',
+            )}/${simularityFilename}`;
+            const simularityJson = await got.get(simularityFullPath).json();
+            return simularityJson;
+        } catch {
+            return {};
         }
     }
 
