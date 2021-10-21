@@ -154,11 +154,12 @@ export class MembersService {
         updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
-            const getMemberResult = await this.getMemberBySeq(memberSeq);
-            const member = getMemberResult?.member;
+            const member = await this.members.findOne({
+                mbrSeq: memberSeq,
+            });
 
-            if (!getMemberResult.ok) {
-                return getMemberResult;
+            if (!member) {
+                return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
             }
 
             member.updaterSeq = member.mbrSeq;
