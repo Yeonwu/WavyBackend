@@ -81,6 +81,7 @@ export class Member extends CoreEntity {
         type: String,
     })
     @IsString()
+    @IsOptional()
     profileImageUrl?: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
