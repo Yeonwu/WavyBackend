@@ -84,6 +84,7 @@ import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
                 Tag,
             ],
         }),
+        TypeOrmModule.forFeature([Member]),
         AwsSdkModule.forRoot({
             defaultServiceOptions: {
                 region: process.env.AWS_REGOIN,
