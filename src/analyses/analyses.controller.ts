@@ -7,7 +7,6 @@ import {
     Post,
     Put,
     Query,
-    Req,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -19,11 +18,16 @@ import {
     ApiParam,
     ApiTags,
 } from '@nestjs/swagger';
-import { Request } from 'express';
 import { AuthJwt, RawJwt } from 'src/auth/auth-jwt.decorator';
 import { AuthMember } from 'src/auth/auth-member.decorator';
 import { MemberGuard } from 'src/auth/auth.guard';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { UserVideoS3Service } from 'src/aws/aws-user-video.service';
+import {
+    GetS3DownloadSignedUrlInput,
+    GetS3DownloadSignedUrlOutput,
+} from 'src/aws/dtos/get-s3-download-signed-url.dto';
+import { GetS3UploadSignedUrlOutput } from 'src/aws/dtos/get-s3-upload-signed-url.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PaginationInput } from 'src/common/dtos/pagination.dto';
 import { TimeoutInterceptor } from 'src/common/timeout.interceptor';
@@ -45,7 +49,10 @@ import { SearchAnalysisInput } from './dtos/search-analyses.dto';
 @ApiBearerAuth('access-token')
 @Controller('analyses')
 export class AnalysesController {
-    constructor(private readonly analysesService: AnalysesService) {}
+    constructor(
+        private readonly analysesService: AnalysesService,
+        private readonly userVideoS3Service: UserVideoS3Service,
+    ) {}
 
     @ApiOperation({
         summary: '분석결과 목록 조회',
@@ -87,6 +94,48 @@ export class AnalysesController {
             orderby,
             page,
         );
+    }
+
+    @ApiOperation({
+        summary: '사용자 비디오에 접근하는 URL 받아오기',
+        description: `사용자 비디오를 저장한 S3 객체에 접근할 수 있는 URL을 받아옵니다.
+         파일이 존재하지 않더라도 URL이 리턴됩니다.
+          존재하지 않는 파일에 접근하는 URL로 요청하면 aws측에서 404응답과 함께 xml형식의 에러메세지를 리턴합니다.`,
+    })
+    @ApiBearerAuth('access-token')
+    @ApiOkResponse({
+        description: '정상적으로 URL을 받아왔습니다.',
+        type: GetS3DownloadSignedUrlOutput,
+    })
+    @Get('s3-download-signed-url')
+    @UseGuards(MemberGuard)
+    getUserVideoDownloadSignedUrl(
+        @AuthMember() authMember: Member,
+        @Query() getS3SignedUrlInput: GetS3DownloadSignedUrlInput,
+    ): Promise<GetS3DownloadSignedUrlOutput> {
+        return this.userVideoS3Service.getS3DownloadSignedUrl(
+            authMember,
+            getS3SignedUrlInput,
+        );
+    }
+
+    @ApiOperation({
+        summary: 'S3 업로드 URL 받아오기 ',
+        description: `비디오를 업로드 할 수 있는 S3 URL과 파일명을 받아옵니다.\n
+        업로드시 파일명, 확장자는 상관없이 올려주셔도 괜찮습니다. 자동으로 변경됩니다.\n
+        업로드가 성공적으로 완료될 경우 200 OK로 응답이 옵니다.\n
+        업로드가 완료된 다음 분석요청 API를 호출해주세요.\n
+        `,
+    })
+    @ApiBearerAuth('access-token')
+    @ApiOkResponse({
+        description: '정상적으로 URL을 받아왔습니다.',
+        type: GetS3UploadSignedUrlOutput,
+    })
+    @Get('s3-upload-signed-url')
+    @UseGuards(MemberGuard)
+    getUserVideoSignedUrl(): Promise<GetS3UploadSignedUrlOutput> {
+        return this.userVideoS3Service.getS3UploadSignedUrl();
     }
 
     @ApiOperation({
