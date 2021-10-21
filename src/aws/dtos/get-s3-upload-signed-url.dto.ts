@@ -13,7 +13,7 @@ export class GetS3UploadSignedUrlOutput extends CoreOutput {
 
     @ApiPropertyOptional({
         description:
-            '업로드할 파일명. 업로드시 받아온 파일명으로 파일 이름을 변경하여 업로드해주세요.',
+            'S3에 업로드될 파일명. AWS에서 자동으로 파일명을 변경해줍니다. 클라이언트에서 파일명을 변경할 필요는 없습니다. 다만 업로드한 후 등록 API를 호출할 때 이 값을 기준으로 호출해주세요.',
         type: String,
     })
     @IsUrl()

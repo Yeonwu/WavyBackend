@@ -7,6 +7,7 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtMiddleware } from 'src/auth/auth-jwt.middleware';
 import { AuthModule } from 'src/auth/auth.module';
+import { UserVideoS3Service } from 'src/aws/aws-user-video.service';
 import { AwsModule } from 'src/aws/aws.module';
 import { MembersModule } from 'src/members/members.module';
 import { RefVideosModule } from 'src/ref-videos/ref-videos.module';
@@ -23,7 +24,7 @@ import { Analysis } from './entities/analyses.entity';
         AwsModule,
     ],
     controllers: [AnalysesController],
-    providers: [AnalysesService],
+    providers: [AnalysesService, UserVideoS3Service],
 })
 export class AnalysesModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
