@@ -25,7 +25,7 @@ export class AuthService {
         try {
             const hostName = this.configService.get('KAKAO_LOGIN_HOST');
             const clientId = this.configService.get('KAKAO_CLIENT_ID');
-            const baseDomain = this.configService.get('BASE_DOMAIN');
+            const baseDomain = 'http://localhost:3000';
             const redirectUrl = `${baseDomain}/auth/kakaoLoginRedirect`;
 
             const url = `https://${hostName}/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code`;
