@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { UserImageS3Service } from 'src/aws/aws-user-image.service';
 import { MemberCertificationMethodCode } from 'src/common/enums/code.enum';
 import { Repository } from 'typeorm';
 import {
@@ -33,6 +34,8 @@ export class MembersService {
 
         @Inject(forwardRef(() => AuthService))
         private readonly authService: AuthService,
+
+        private readonly userImageService: UserImageS3Service,
     ) {}
 
     private buildMember(newMemberInput: CreateMemberInput): Member {
@@ -109,6 +112,16 @@ export class MembersService {
             }
 
             member.mbrKakaoSeq = undefined;
+            const { ok, signedUrl } =
+                await this.userImageService.getS3DownloadSignedUrl(member);
+            if (ok) {
+                member.profileImageUrl = signedUrl;
+            } else {
+                return {
+                    ok: false,
+                    error: '회원 프로필 사진 url을 받아오지 못했습니다.',
+                };
+            }
 
             return { ok: true, member };
         } catch (error) {
