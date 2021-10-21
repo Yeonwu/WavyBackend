@@ -61,7 +61,7 @@ export class AwsService {
         s3ObjectKey: string,
         mirrorEffect: boolean,
     ): Promise<string> {
-        const sourceBucket = this.config.get('AWS_UPLOAD_S3_BUCKET');
+        const sourceBucket = this.config.get('AWS_USER_VIDEO_UPLOAD_S3_BUCKET');
         const destinationBucket = this.config.get(
             'AWS_USER_VIDEO_DESTINATION_BUCKET',
         );
