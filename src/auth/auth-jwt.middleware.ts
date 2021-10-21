@@ -1,13 +1,16 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { MembersService } from 'src/members/members.service';
+import { Member } from 'src/members/entities/members.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
     constructor(
         private readonly jwtService: JwtService,
-        private readonly memberService: MembersService,
+        @InjectRepository(Member)
+        private readonly member: Repository<Member>,
     ) {}
     async use(req: Request, res: Response, next: NextFunction) {
         try {
@@ -20,12 +23,11 @@ export class JwtMiddleware implements NestMiddleware {
                 if (typeof decoded === 'object') {
                     req.headers['x-jwt-decoded'] = JSON.stringify(decoded);
                     if (decoded.hasOwnProperty('mbrSeq')) {
-                        const { ok, member } =
-                            await this.memberService.getMemberBySeq(
-                                decoded.mbrSeq,
-                            );
+                        const member = await this.member.findOne({
+                            mbrSeq: decoded.mbrSeq,
+                        });
 
-                        if (!ok) {
+                        if (!member) {
                             throw new Error(
                                 `Cannot find Member by mbrSeq(${decoded.mbrSeq}).`,
                             );
