@@ -18,7 +18,7 @@ import {
 } from 'src/common/enums/code.enum';
 import { Practice } from 'src/practices/entities/practice.entity';
 import { MemberExpHistory } from './mbr-exp-history.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { RefVideo } from 'src/ref-videos/entities/ref-video.entity';
 import {
     Column,
@@ -76,9 +76,13 @@ export class Member extends CoreEntity {
         length: 255,
         nullable: true,
     })
-    @ApiProperty({ description: '회원 프로필 이미지 URL', type: String })
-    @IsUrl()
-    profileImageUrl: string;
+    @ApiPropertyOptional({
+        description: '회원 프로필 이미지 URL',
+        type: String,
+    })
+    @IsString()
+    @IsOptional()
+    profileImageUrl?: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
     @ApiProperty({

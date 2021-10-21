@@ -53,8 +53,8 @@ import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
 
                 AWS_PROFILE: Joi.string().required(),
                 AWS_PRIVATE_KEY_LOCATION: Joi.string().required(),
-                AWS_UPLOAD_S3_BUCKET: Joi.string().required(),
 
+                AWS_USER_VIDEO_UPLOAD_S3_BUCKET: Joi.string().required(),
                 AWS_USER_VIDEO_DESTINATION_BUCKET: Joi.string().required(),
 
                 AWS_API_GATEWAY_ENDPOINT: Joi.string().required(),
@@ -84,6 +84,7 @@ import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
                 Tag,
             ],
         }),
+        TypeOrmModule.forFeature([Member]),
         AwsSdkModule.forRoot({
             defaultServiceOptions: {
                 region: process.env.AWS_REGOIN,

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthJwtDecoded } from 'src/auth/dtos/auth-jwt-core';
+import { UserImageS3Service } from 'src/aws/aws-user-image.service';
 import { MemberCertificationMethodCode } from 'src/common/enums/code.enum';
 import { Repository } from 'typeorm';
 import {
@@ -33,6 +34,8 @@ export class MembersService {
 
         @Inject(forwardRef(() => AuthService))
         private readonly authService: AuthService,
+
+        private readonly userImageService: UserImageS3Service,
     ) {}
 
     private buildMember(newMemberInput: CreateMemberInput): Member {
@@ -88,9 +91,19 @@ export class MembersService {
         return MEMBER_EXISTS && !IS_MEMBER_DELETED;
     }
 
-    getLoggedInMember(member: Member): getLoggedInMemberOutput {
+    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
         try {
             if (member.mbrSeq) {
+                const { ok, signedUrl } =
+                    await this.userImageService.getS3DownloadSignedUrl(member);
+                if (ok) {
+                    member.profileImageUrl = signedUrl;
+                } else {
+                    return {
+                        ok: false,
+                        error: '회원 프로필 사진 url을 받아오지 못했습니다.',
+                    };
+                }
                 return { ok: true, member };
             }
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
@@ -109,6 +122,16 @@ export class MembersService {
             }
 
             member.mbrKakaoSeq = undefined;
+            const { ok, signedUrl } =
+                await this.userImageService.getS3DownloadSignedUrl(member);
+            if (ok) {
+                member.profileImageUrl = signedUrl;
+            } else {
+                return {
+                    ok: false,
+                    error: '회원 프로필 사진 url을 받아오지 못했습니다.',
+                };
+            }
 
             return { ok: true, member };
         } catch (error) {
@@ -141,11 +164,12 @@ export class MembersService {
         updateMemberInput: UpdateMemberInput,
     ): Promise<UpdateMemberOutput> {
         try {
-            const getMemberResult = await this.getMemberBySeq(memberSeq);
-            const member = getMemberResult?.member;
+            const member = await this.members.findOne({
+                mbrSeq: memberSeq,
+            });
 
-            if (!getMemberResult.ok) {
-                return getMemberResult;
+            if (!member) {
+                return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
             }
 
             member.updaterSeq = member.mbrSeq;

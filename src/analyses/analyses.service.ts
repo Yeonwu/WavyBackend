@@ -157,7 +157,7 @@ export class AnalysesService {
                 .andWhere('an.an_deleted = false')
                 .getOne();
 
-            const simularityJson = this.getSimularityJson(
+            const simularityJson = await this.getSimularityJson(
                 analysis.anSimularityFilename,
             );
 

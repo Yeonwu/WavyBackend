@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtMiddleware } from 'src/auth/auth-jwt.middleware';
 import { AuthModule } from 'src/auth/auth.module';
+import { AwsModule } from 'src/aws/aws.module';
 import { MemberExpHistory } from './entities/mbr-exp-history.entity';
 import { Member } from './entities/members.entity';
 import { MbrExpHistoriesService } from './mbr-exp-histories.service';
@@ -21,6 +22,7 @@ import { MembersService } from './members.service';
         TypeOrmModule.forFeature([Member, MemberExpHistory]),
         ConfigModule,
         forwardRef(() => AuthModule),
+        AwsModule,
     ],
     controllers: [MembersController],
     providers: [MembersService, MbrStaticsSerivce, MbrExpHistoriesService],
