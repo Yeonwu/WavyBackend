@@ -91,9 +91,19 @@ export class MembersService {
         return MEMBER_EXISTS && !IS_MEMBER_DELETED;
     }
 
-    getLoggedInMember(member: Member): getLoggedInMemberOutput {
+    async getLoggedInMember(member: Member): Promise<getLoggedInMemberOutput> {
         try {
             if (member.mbrSeq) {
+                const { ok, signedUrl } =
+                    await this.userImageService.getS3DownloadSignedUrl(member);
+                if (ok) {
+                    member.profileImageUrl = signedUrl;
+                } else {
+                    return {
+                        ok: false,
+                        error: '회원 프로필 사진 url을 받아오지 못했습니다.',
+                    };
+                }
                 return { ok: true, member };
             }
             return { ok: false, error: '회원 정보 조회에 실패했습니다.' };
