@@ -80,7 +80,7 @@ export class Member extends CoreEntity {
         description: '회원 프로필 이미지 URL',
         type: String,
     })
-    @IsUrl()
+    @IsString()
     profileImageUrl?: string;
 
     @Column({ name: 'mbr_privacy_consent', type: 'varchar', length: 50 })
