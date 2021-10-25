@@ -78,6 +78,14 @@ export class MembersService {
                 jwt.exp,
             );
 
+            const { ok, signedUrl, error } =
+                await this.userImageService.getS3DownloadSignedUrl(newMember);
+
+            if (!ok) {
+                return { ok: false, error };
+            }
+            newMember.profileImageUrl = signedUrl;
+
             return { ok: true, member: newMember, token: newToken };
         } catch (error) {
             console.log(error.message);
