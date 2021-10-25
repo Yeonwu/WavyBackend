@@ -7,7 +7,9 @@
     "license": "UNLICENSED",
     "scripts": {
         "prebuild": "rimraf dist",
-        "build": "nest build",
+        "build": "cross-env NODE_ENV=prod nest build",
+        "build:test": "cross-env NODE_ENV=test nest build",
+        "build:dev": "cross-env NODE_ENV=dev nest build",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "start:prod": "cross-env NODE_ENV=prod nest build && pm2 start --only prod-app",
         "start:dev": "cross-env NODE_ENV=dev nest start --watch",
