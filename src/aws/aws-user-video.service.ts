@@ -77,7 +77,7 @@ export class UserVideoS3Service {
             }
 
             const s3ObjectName = analysis.anUserVideoFilename;
-            const cfUrl = this.config.get('AWS_CLOUDFRONT_ENDPOINT');
+            const cfUrl = this.config.get('AWS_USER_VIDEO_CF_ENDPOINT');
             const keypairId = 'K2EDJ5BBPQ7ZL3';
             const s3UploadSignedUrl = cf.getSignedUrl(
                 `${cfUrl}/${s3ObjectName}`,

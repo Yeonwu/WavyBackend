@@ -27,41 +27,60 @@ import { AwsModule } from './aws/aws.module';
 import { AwsSdkModule } from 'nest-aws-sdk';
 import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
 
+const getEnvFilePath = (node_env: string): string => {
+    if (node_env === 'dev') {
+        return '.env.dev';
+    } else if (node_env === 'test') {
+        return '.env.test';
+    } else if (node_env === 'prod') {
+        return '.env.prod';
+    } else {
+        return '.env.dev';
+    }
+};
+
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath:
-                process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.dev',
-            ignoreEnvFile: process.env.NODE_ENV === 'prod',
+            envFilePath: getEnvFilePath(process.env.NODE_ENV),
             validationSchema: Joi.object({
-                NODE_ENV: Joi.string().valid('dev', 'test').required(),
+                NODE_ENV: Joi.string().valid('dev', 'test', 'prod').required(),
+
                 DB_HOST: Joi.string().required(),
                 DB_PORT: Joi.string().required(),
                 DB_USER: Joi.string().required(),
                 DB_PW: Joi.string().required(),
                 DB_NAME: Joi.string().required(),
 
-                SYSTEM_MBR_SEQ: Joi.number().required(),
-
                 SECRET_KEY: Joi.string().required(),
 
-                KAKAO_CLIENT_ID: Joi.string().required(),
-                KAKAO_LOGIN_HOST: Joi.string().required(),
-                KAKAO_GRANT_TYPE: Joi.string().required(),
-                BASE_DOMAIN: Joi.string().required(),
+                SYSTEM_MBR_SEQ: Joi.number().required(),
 
+                KAKAO_LOGIN_HOST: Joi.string().required(),
+                KAKAO_LOGOUT_HOST: Joi.string().required(),
+                KAKAO_CLIENT_ID: Joi.string().required(),
+                KAKAO_GRANT_TYPE: Joi.string().required(),
+
+                AWS_REGION: Joi.string().required(),
                 AWS_PROFILE: Joi.string().required(),
                 AWS_PRIVATE_KEY_LOCATION: Joi.string().required(),
 
                 AWS_USER_VIDEO_UPLOAD_S3_BUCKET: Joi.string().required(),
-                AWS_USER_VIDEO_DESTINATION_BUCKET: Joi.string().required(),
+                AWS_USER_VIDEO_CF_ENDPOINT: Joi.string().required(),
+                AWS_USER_VIDEO_CONVERTED_BUCKET: Joi.string().required(),
 
-                AWS_API_GATEWAY_ENDPOINT: Joi.string().required(),
+                AWS_USER_IMAGE_S3_BUCKET: Joi.string().required(),
+                DEFAULT_USER_IMAGE: Joi.string().required(),
+
+                AWS_AN_JSON_BUCKET_ENDPOINT: Joi.string().required(),
+                AWS_EXT_JSON_BUCKET_ENDPOINT: Joi.string().required(),
 
                 CORS_ORIGINS: Joi.string().required(),
                 CORS_HEADERS: Joi.string().required(),
                 CORS_METHODS: Joi.string().required(),
+
+                USER_VIDEO_ANALYST_REQ_URL: Joi.string().required(),
             }),
         }),
         TypeOrmModule.forRoot({

@@ -63,7 +63,7 @@ export class AwsService {
     ): Promise<string> {
         const sourceBucket = this.config.get('AWS_USER_VIDEO_UPLOAD_S3_BUCKET');
         const destinationBucket = this.config.get(
-            'AWS_USER_VIDEO_DESTINATION_BUCKET',
+            'AWS_USER_VIDEO_CONVERTED_BUCKET',
         );
         const requestBody = {
             body: {
