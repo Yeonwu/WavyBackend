@@ -45,7 +45,7 @@ const getEnvFilePath = (node_env: string): string => {
             isGlobal: true,
             envFilePath: getEnvFilePath(process.env.NODE_ENV),
             validationSchema: Joi.object({
-                NODE_ENV: Joi.string().valid('dev', 'test').required(),
+                NODE_ENV: Joi.string().valid('dev', 'test', 'prod').required(),
 
                 DB_HOST: Joi.string().required(),
                 DB_PORT: Joi.string().required(),
