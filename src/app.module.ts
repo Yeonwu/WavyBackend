@@ -25,7 +25,7 @@ import { JwtMiddleware } from './auth/auth-jwt.middleware';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AwsModule } from './aws/aws.module';
 import { AwsSdkModule } from 'nest-aws-sdk';
-import { Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
+import { EC2, Lambda, S3, SharedIniFileCredentials } from 'aws-sdk';
 
 const getEnvFilePath = (node_env: string): string => {
     if (node_env === 'dev') {
@@ -115,7 +115,7 @@ const getEnvFilePath = (node_env: string): string => {
                     timeout: 300000,
                 },
             },
-            services: [S3, Lambda],
+            services: [S3, Lambda, EC2],
         }),
         MembersModule,
         PracticesModule,

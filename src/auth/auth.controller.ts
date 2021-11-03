@@ -1,4 +1,10 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Query,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
     ApiBadRequestResponse,
@@ -9,6 +15,7 @@ import {
     ApiQuery,
     ApiTags,
 } from '@nestjs/swagger';
+import { StartMLInstanceInterceptor } from 'src/aws/aws-ml-instance.interceptor';
 import { AuthJwt } from './auth-jwt.decorator';
 import { AccessTokenGuard } from './auth.guard';
 import { AuthService } from './auth.service';
@@ -72,6 +79,7 @@ export class AuthController {
         type: GetJwtOutput,
     })
     @Get('token')
+    @UseInterceptors(StartMLInstanceInterceptor)
     getJwtToken(@Query() getJwtInput: GetJwtInput): Promise<GetJwtOutput> {
         return this.authService.getJwt(getJwtInput);
     }
