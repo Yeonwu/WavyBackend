@@ -79,11 +79,14 @@ export class UserVideoS3Service {
             const s3ObjectName = analysis.anUserVideoFilename;
             const cfUrl = this.config.get('AWS_USER_VIDEO_CF_ENDPOINT');
             const keypairId = 'K2EDJ5BBPQ7ZL3';
+            const expireTime = new Date();
+            expireTime.setDate(expireTime.getDate() + 7);
+
             const s3UploadSignedUrl = cf.getSignedUrl(
                 `${cfUrl}/${s3ObjectName}`,
                 {
                     privateKeyPath: this.config.get('AWS_PRIVATE_KEY_LOCATION'),
-                    expireTime: new Date(2021, 10, 10, 0, 0, 0),
+                    expireTime,
                     keypairId,
                 },
             );
